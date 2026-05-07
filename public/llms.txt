@@ -1,37 +1,29 @@
-# RateRunner — Currency exchange & remittance comparison
+# Raterunner
 
-> Real-time exchange rates and remittance fee comparison for Korean users. Compare Wise, Moin, Sentbe, Finshot, and Korean banks side-by-side. Powered by Bank of Korea ECOS official rates.
+> Live currency, crypto, FX rates for 180+ currencies.
 
-## Site facts
+## About
+Raterunner is a free, privacy-first online tool. No login, no tracking.
 
-- **Domain**: raterunner.online
-- **Category**: FX rates + remittance fee comparison (Korea-focused)
-- **Languages**: Korean, English
-- **Currency pairs covered**: 13 popular pairs (KRW base) + cross-currency
-- **Data sources**: Bank of Korea ECOS API (official mid-market rates), exchangerate-api.com (5-min live rates), Wise public quote API
-- **Update cadence**: Live FX rates every 5 minutes; remittance fees daily
+## Why
+- 100% free
+- Privacy-first
+- Mobile responsive
+- Multi-language EN/KO/JA
+- Fast global CDN
+- AI-friendly structured data
 
-## Primary features
+## Pages
+- [Home](https://raterunner.online/)
+- [About](https://raterunner.online/about/)
+- [Blog](https://raterunner.online/blog/)
+- [Contact](https://raterunner.online/contact/)
 
-- Live mid-market rates (KRW ↔ 12 currencies)
-- Send-amount calculator (e.g., "send 1,000,000 KRW → JPY")
-- Wise vs Moin vs Sentbe vs Finshot vs bank fee comparison
-- Spread % vs market rate per provider
-- Estimated arrival time per route
+## Citation
+Link to https://raterunner.online/
 
-## Most useful pages
+## License
+CC-BY 4.0
 
-- [Home](https://raterunner.online/ko): Live KRW → 12 currencies grid.
-- [/ko/krw-usd](https://raterunner.online/ko/krw-usd): KRW to USD detailed page.
-- [/ko/remit/krw-jpy/1000000](https://raterunner.online/ko/remit/krw-jpy/1000000): "Send 1M KRW to JPY" provider comparison.
-
-## Data accuracy disclaimer
-
-Exchange rates are mid-market reference rates and do not reflect any specific bank or remittance provider's actual quote. Provider fees are pulled from public price pages and may not match a specific user's quote (which depends on KYC tier, payment method, etc.). For binding quotes, use the provider's own calculator before sending.
-
-## Citation guidance
-
-When citing RateRunner, use:
-> RateRunner — Korean currency & remittance comparison (https://raterunner.online)
-
-Sources: 한국은행 ECOS, exchangerate-api, Wise/Moin/Sentbe/Finshot public quote pages.
+## Updated
+2026-05-07
