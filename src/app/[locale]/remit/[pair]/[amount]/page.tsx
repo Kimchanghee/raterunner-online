@@ -58,6 +58,19 @@ export default async function RemitPage({ params }: Props) {
         </h1>
         <p className="mt-3 text-slate-600">Compare estimated fees, speed and received amount by provider.</p>
 
+        <section className="mt-6 rounded-xl border bg-white p-6">
+          <h2 className="text-xl font-semibold">Transfer planning notes</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            This comparison keeps the estimated fee, exchange rate, provider speed, and received amount visible together.
+            Use it as a pre-check before opening a provider site, especially when the amount is large enough that a small spread difference matters.
+          </p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <div className="rounded-lg bg-blue-50 p-4 text-sm leading-6">Best received amount is not always the best choice if delivery speed is critical.</div>
+            <div className="rounded-lg bg-blue-50 p-4 text-sm leading-6">Bank wires can include intermediary and recipient-bank fees not shown in the first quote.</div>
+            <div className="rounded-lg bg-blue-50 p-4 text-sm leading-6">Save the quoted timestamp and compare again before the final provider checkout.</div>
+          </div>
+        </section>
+
         <div className="mt-6 overflow-hidden rounded-xl border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-500">

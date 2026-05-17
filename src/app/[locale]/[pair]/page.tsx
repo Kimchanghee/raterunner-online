@@ -26,6 +26,10 @@ export default async function PairPage({ params }: Props) {
 
   const rates = await fetchLiveRate(parsed.base).catch(() => ({} as Record<string, number>));
   const rate = rates[parsed.quote] || 0;
+  const examples = [100_000, 500_000, 1_000_000].map((amount) => ({
+    amount,
+    receive: rate ? amount * rate : 0,
+  }));
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -44,6 +48,25 @@ export default async function PairPage({ params }: Props) {
           Live market reference for {parsed.base}/{parsed.quote}, refreshed about every 5 minutes.
         </p>
 
+        <section className="mt-6 rounded-xl border bg-white p-6">
+          <h2 className="text-xl font-semibold">How to use this rate page</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            RateRunner keeps the exchange-rate decision on the page before sending you to a bank or transfer provider.
+            Compare the live market reference, common remittance amounts, spread, and timing together so the next click is an informed action rather than an ad-driven jump.
+          </p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {examples.map((row) => (
+              <div key={row.amount} className="rounded-lg bg-blue-50 p-4">
+                <div className="text-xs uppercase tracking-wide text-blue-700">Example conversion</div>
+                <div className="mt-2 font-semibold">{row.amount.toLocaleString('ko-KR')} {parsed.base}</div>
+                <div className="mt-1 font-mono text-blue-700">
+                  {row.receive ? row.receive.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '-'} {parsed.quote}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <div className="mt-6 rounded-xl border bg-white p-6">
           <div className="text-sm uppercase tracking-wide text-slate-500">Current rate</div>
           <div className="mt-2 font-mono text-4xl font-bold text-blue-600">
@@ -51,6 +74,15 @@ export default async function PairPage({ params }: Props) {
           </div>
           <p className="mt-2 text-sm text-slate-500">1 {parsed.base}</p>
         </div>
+
+        <section className="mt-8 rounded-xl border bg-white p-6">
+          <h2 className="text-xl font-semibold">Before you transfer</h2>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
+            <li>- Compare both the displayed exchange rate and the fixed fee; a better rate can still lose after fees.</li>
+            <li>- Check whether the recipient bank deducts an incoming transfer charge.</li>
+            <li>- Recheck the quote near execution time because volatile currencies can move during checkout.</li>
+          </ul>
+        </section>
 
         <h2 className="mt-8 text-2xl font-semibold">Popular remittance amounts</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
