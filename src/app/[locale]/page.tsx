@@ -105,15 +105,15 @@ export default async function Home({ params }: Props) {
           <h2 className="mb-2 text-xl font-semibold">Partner Picks</h2>
           <p className="mb-4 text-sm text-slate-600">여행/환전/가계부 관련 추천 링크입니다.</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <a className="rounded-lg border border-amber-300 bg-amber-50 p-4 hover:border-amber-400" href={buildAmazonUrl('travel budget planner')} target="_blank" rel="sponsored noopener noreferrer">
+            <a className="rounded-lg border border-amber-300 bg-amber-50 p-4 hover:border-amber-400" href={buildAmazonUrl('travel budget planner')} target="_blank" rel="sponsored noopener noreferrer nofollow" data-affiliate-link>
               <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Amazon</p>
               <p className="mt-1 text-sm">Travel Budget Planner</p>
             </a>
-            <a className="rounded-lg border border-blue-300 bg-blue-50 p-4 hover:border-blue-400" href={buildCoupangUrl('여행 환전 지갑')} target="_blank" rel="sponsored noopener noreferrer">
+            <a className="rounded-lg border border-blue-300 bg-blue-50 p-4 hover:border-blue-400" href={buildCoupangUrl('여행 환전 지갑')} target="_blank" rel="sponsored noopener noreferrer nofollow" data-affiliate-link>
               <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Coupang</p>
               <p className="mt-1 text-sm">여행 환전 지갑</p>
             </a>
-            <a className="rounded-lg border border-rose-300 bg-rose-50 p-4 hover:border-rose-400" href={buildAliExpressUrl('currency wallet')} target="_blank" rel="sponsored noopener noreferrer">
+            <a className="rounded-lg border border-rose-300 bg-rose-50 p-4 hover:border-rose-400" href={buildAliExpressUrl('currency wallet')} target="_blank" rel="sponsored noopener noreferrer nofollow" data-affiliate-link>
               <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">AliExpress</p>
               <p className="mt-1 text-sm">Currency Wallet</p>
             </a>
