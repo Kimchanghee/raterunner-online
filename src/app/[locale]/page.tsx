@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { fetchLiveRate, POPULAR_PAIRS, AMOUNT_BUCKETS } from '@/lib/exchange';
 import Link from 'next/link';
+import SafeInlineAdsterra from '@/components/SafeInlineAdsterra';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -120,6 +121,7 @@ export default async function Home({ params }: Props) {
           </div>
         </div>
       </section>
+          <SafeInlineAdsterra placement="homepage-inline" />
     </main>
   );
 }
