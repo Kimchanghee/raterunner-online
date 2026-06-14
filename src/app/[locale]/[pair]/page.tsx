@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { fetchLiveRate, POPULAR_PAIRS, AMOUNT_BUCKETS } from '@/lib/exchange';
 
 interface Props {
@@ -15,6 +16,20 @@ function parsePair(pair: string) {
   const [base, quote] = pair.split('-').map((v) => v.toUpperCase());
   const supported = POPULAR_PAIRS.some(([b, q]) => b === base && q === quote);
   return supported ? { base, quote } : null;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, pair } = await params;
+  const parsed = parsePair(pair);
+  if (!SUPPORTED_LOCALES.includes(locale as any) || !parsed) return {};
+  const title = `${parsed.base} to ${parsed.quote} exchange rate | RateRunner`;
+  const description = `Live ${parsed.base}/${parsed.quote} exchange rate, examples, spread notes, and transfer planning context.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/${pair}/` },
+    openGraph: { title, description, url: `https://raterunner.online/${locale}/${pair}/` },
+  };
 }
 
 export default async function PairPage({ params }: Props) {

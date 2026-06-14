@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { fetchLiveRate, POPULAR_PAIRS, AMOUNT_BUCKETS } from '@/lib/exchange';
 
 interface Props {
@@ -27,6 +28,21 @@ function providerRows(amount: number, rate: number) {
     const fee = amount * p.feePct;
     return { ...p, fee, receive: Math.max(0, amount - fee) * rate };
   }).sort((a, b) => b.receive - a.receive);
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, pair, amount: rawAmount } = await params;
+  const parsed = parsePair(pair);
+  const amount = Number(rawAmount);
+  if (!SUPPORTED_LOCALES.includes(locale as any) || !parsed || !AMOUNT_BUCKETS.includes(amount as any)) return {};
+  const title = `Send ${amount.toLocaleString('ko-KR')} ${parsed.base} to ${parsed.quote} | RateRunner`;
+  const description = `Compare estimated transfer fees, delivery speed, and received ${parsed.quote} for ${amount.toLocaleString('ko-KR')} ${parsed.base}.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/remit/${pair}/${rawAmount}/` },
+    openGraph: { title, description, url: `https://raterunner.online/${locale}/remit/${pair}/${rawAmount}/` },
+  };
 }
 
 export default async function RemitPage({ params }: Props) {

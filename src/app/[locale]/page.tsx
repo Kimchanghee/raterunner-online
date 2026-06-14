@@ -1,4 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { fetchLiveRate, POPULAR_PAIRS, AMOUNT_BUCKETS } from '@/lib/exchange';
 import Link from 'next/link';
 import SafeInlineSponsored from '@/components/SafeInlineSponsored';
@@ -8,6 +9,14 @@ interface Props {
 }
 
 export const revalidate = 300; // 5분 ISR
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: { canonical: `/${locale}/` },
+    openGraph: { url: `https://raterunner.online/${locale}/` },
+  };
+}
 
 function buildAmazonUrl(keyword: string) {
   const url = new URL('https://www.amazon.com/s');

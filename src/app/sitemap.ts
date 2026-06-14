@@ -14,15 +14,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of LOCALES) {
-    entries.push({ url: `${SITE}/${locale}`, lastModified, changeFrequency: 'hourly', priority: 1.0 });
+    entries.push({ url: `${SITE}/${locale}/`, lastModified, changeFrequency: 'hourly', priority: 1.0 });
     for (const [base, quote] of PAIRS) {
       entries.push({
-        url: `${SITE}/${locale}/${base}-${quote}`,
+        url: `${SITE}/${locale}/${base}-${quote}/`,
         lastModified, changeFrequency: 'hourly', priority: 0.9,
       });
       for (const amount of AMOUNTS) {
         entries.push({
-          url: `${SITE}/${locale}/remit/${base}-${quote}/${amount}`,
+          url: `${SITE}/${locale}/remit/${base}-${quote}/${amount}/`,
           lastModified, changeFrequency: 'daily', priority: 0.7,
         });
       }
