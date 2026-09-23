@@ -2,119 +2,29 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import RateStatus from '@/components/RateStatus';
 import { fetchLiveRate, POPULAR_PAIRS, AMOUNT_BUCKETS } from '@/lib/exchange';
+import { getReferenceRate } from '@/lib/reference-rate';
 
-interface Props {
-  params: Promise<{ locale: string; pair: string }>;
-}
-
+interface Props { params: Promise<{ locale: string; pair: string }> }
 export const revalidate = 300;
-
-const SUPPORTED_LOCALES = ['ko', 'en'] as const;
-
-function parsePair(pair: string) {
-  const [base, quote] = pair.split('-').map((v) => v.toUpperCase());
-  const supported = POPULAR_PAIRS.some(([b, q]) => b === base && q === quote);
-  return supported ? { base, quote } : null;
-}
-
+const SUPPORTED_LOCALES = ['ko', 'en'];
+function parsePair(pair: string) { const [base, quote] = pair.split('-').map(v => v.toUpperCase()); return POPULAR_PAIRS.some(([b, q]) => b === base && q === quote) ? { base, quote } : null; }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, pair } = await params;
-  const parsed = parsePair(pair);
-  if (!SUPPORTED_LOCALES.includes(locale as any) || !parsed) return {};
-  const title = `${parsed.base} to ${parsed.quote} exchange rate | RateRunner`;
-  const description = `Live ${parsed.base}/${parsed.quote} exchange rate, examples, spread notes, and transfer planning context.`;
-  return {
-    title,
-    description,
-    alternates: { canonical: `/${locale}/${pair}/` },
-    openGraph: { title, description, url: `https://raterunner.online/${locale}/${pair}/` },
-  };
+  const { locale, pair } = await params; const parsed = parsePair(pair);
+  if (!SUPPORTED_LOCALES.includes(locale) || !parsed) return {};
+  return { title: `${parsed.base}/${parsed.quote} public reference | RateRunner`, description: `Timestamped reference rate and conversion examples for ${parsed.base}/${parsed.quote}. Not a provider quote.`, alternates: { canonical: `/${locale}/${pair}/` } };
 }
-
 export default async function PairPage({ params }: Props) {
-  const { locale, pair } = await params;
-  if (!SUPPORTED_LOCALES.includes(locale as any)) notFound();
-  const parsed = parsePair(pair);
-  if (!parsed) notFound();
+  const { locale, pair } = await params; const parsed = parsePair(pair);
+  if (!SUPPORTED_LOCALES.includes(locale) || !parsed) notFound();
   setRequestLocale(locale);
-
-  const rates = await fetchLiveRate(parsed.base).catch(() => ({} as Record<string, number>));
-  const rate = rates[parsed.quote] || 0;
-  const examples = [100_000, 500_000, 1_000_000].map((amount) => ({
-    amount,
-    receive: rate ? amount * rate : 0,
-  }));
-
-  return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b bg-white">
-        <div className="container mx-auto flex max-w-6xl items-center justify-between p-4">
-          <Link href={`/${locale}`} className="text-2xl font-bold tracking-tight">
-            <span className="text-blue-600">Rate</span>Runner
-          </Link>
-          <Link href={`/${locale}`} className="text-sm text-slate-600 hover:text-blue-600">All rates</Link>
-        </div>
-      </header>
-
-      <section className="container mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-4xl font-bold tracking-tight">{parsed.base} to {parsed.quote} exchange rate</h1>
-        <p className="mt-3 text-slate-600">
-          Live market reference for {parsed.base}/{parsed.quote}, refreshed about every 5 minutes.
-        </p>
-
-        <section className="mt-6 rounded-xl border bg-white p-6">
-          <h2 className="text-xl font-semibold">How to use this rate page</h2>
-          <p className="mt-3 leading-7 text-slate-700">
-            RateRunner keeps the exchange-rate decision on the page before sending you to a bank or transfer provider.
-            Compare the live market reference, common remittance amounts, spread, and timing together so the next click is an informed action rather than an ad-driven jump.
-          </p>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {examples.map((row) => (
-              <div key={row.amount} className="rounded-lg bg-blue-50 p-4">
-                <div className="text-xs uppercase tracking-wide text-blue-700">Example conversion</div>
-                <div className="mt-2 font-semibold">{row.amount.toLocaleString('ko-KR')} {parsed.base}</div>
-                <div className="mt-1 font-mono text-blue-700">
-                  {row.receive ? row.receive.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '-'} {parsed.quote}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <div className="mt-6 rounded-xl border bg-white p-6">
-          <div className="text-sm uppercase tracking-wide text-slate-500">Current rate</div>
-          <div className="mt-2 font-mono text-4xl font-bold text-blue-600">
-            {rate ? rate.toLocaleString('en-US', { maximumFractionDigits: 6 }) : 'Loading'} {parsed.quote}
-          </div>
-          <p className="mt-2 text-sm text-slate-500">1 {parsed.base}</p>
-        </div>
-
-        <section className="mt-8 rounded-xl border bg-white p-6">
-          <h2 className="text-xl font-semibold">Before you transfer</h2>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
-            <li>- Compare both the displayed exchange rate and the fixed fee; a better rate can still lose after fees.</li>
-            <li>- Check whether the recipient bank deducts an incoming transfer charge.</li>
-            <li>- Recheck the quote near execution time because volatile currencies can move during checkout.</li>
-          </ul>
-        </section>
-
-        <h2 className="mt-8 text-2xl font-semibold">Popular remittance amounts</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {AMOUNT_BUCKETS.map((amount) => (
-            <Link
-              key={amount}
-              href={`/${locale}/remit/${pair}/${amount}`}
-              className="rounded-lg border bg-white p-4 hover:border-blue-400"
-            >
-              <div className="font-semibold">{amount.toLocaleString('ko-KR')} {parsed.base}</div>
-              <div className="text-sm text-slate-500">
-                Estimated receive: {rate ? (amount * rate).toLocaleString('en-US', { maximumFractionDigits: 2 }) : '-'} {parsed.quote}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
+  const snapshot = await fetchLiveRate(parsed.base); const rate = getReferenceRate(snapshot, parsed.quote);
+  return <main className="ledger-shell"><header className="site-header"><Link className="wordmark" href={`/${locale}`}>RATE<span>RUNNER</span><small>REFERENCE LEDGER</small></Link><Link className="header-note" href={`/${locale}`}>← ALL RATES</Link></header>
+    <div className="ledger-layout narrow"><nav className="breadcrumb"><Link href={`/${locale}`}>Rate board</Link><span>/</span>{parsed.base} / {parsed.quote}</nav>
+      <section className="hero compact"><div className="eyebrow">PAIR DOSSIER / {parsed.base} → {parsed.quote}</div><h1>{parsed.base} <em>/ {parsed.quote}</em></h1><p>Public exchange-rate reference. Confirm provider execution rates and fees separately before sending.</p></section>
+      <section className="ledger-panel pair-hero"><div className="panel-heading"><span className="eyebrow">01 / Observed reference</span><h2>1 {parsed.base} in {parsed.quote}</h2></div><div className="big-rate">{rate === null ? 'Rate unavailable' : rate.toLocaleString('en-US', { maximumFractionDigits: 8 })} {rate !== null && <small>{parsed.quote}</small>}</div><RateStatus snapshot={snapshot} quote={parsed.quote} /></section>
+      <section className="ledger-panel"><div className="panel-heading"><span className="eyebrow">02 / Arithmetic only</span><h2>Conversion examples <small>before fees and spread</small></h2></div><div className="example-grid">{[100_000, 500_000, 1_000_000].map(amount => <div className="example-cell" key={amount}><span>{amount.toLocaleString('en-US')} {parsed.base}</span><strong>{rate === null ? 'Unavailable' : (amount * rate).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ` ${parsed.quote}`}</strong></div>)}</div><p className="source-note">These are multiplication examples, not transfer proceeds. {snapshot.state === 'stale' ? 'The source rate is stale.' : ''}</p></section>
+      <section className="ledger-panel"><div className="panel-heading"><span className="eyebrow">03 / Next step</span><h2>Fee worksheets <small>not provider rankings</small></h2></div><div className="scenario-grid">{AMOUNT_BUCKETS.map(amount => <Link key={amount} href={`/${locale}/remit/${pair}/${amount}`}>{amount.toLocaleString('en-US')} {parsed.base}<span>Open worksheet ↗</span></Link>)}</div><p className="source-note">Ask each provider for its own timestamped rate, fixed/percentage fees, intermediary charges, and delivery estimate.</p></section>
+    </div></main>;
 }

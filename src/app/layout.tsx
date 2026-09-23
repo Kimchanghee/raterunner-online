@@ -3,9 +3,9 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'RateRunner — 실시간 환율 + 송금 경로 비교',
-  description: 'USD·EUR·JPY·KRW 실시간 환율, 해외 송금 수수료 + 환율 통합 비교. Wise·페이팔·은행 송금 경로 한 번에.',
-  keywords: ['환율', '실시간 환율', 'USD KRW', 'EUR KRW', '송금', '해외송금', 'Wise', 'remittance', 'exchange rate'],
+  title: 'RateRunner | 공개 기준 환율과 송금 수수료 계산',
+  description: '시각이 표시된 공개 기준 환율과 직접 입력하는 송금 수수료 계산기. 송금사별 실시간 견적이나 순위가 아닙니다.',
+  keywords: ['환율', '기준 환율', 'USD KRW', 'EUR KRW', '송금 수수료 계산', 'exchange rate'],
   metadataBase: new URL('https://raterunner.online'),
   alternates: {
     canonical: '/',
@@ -16,10 +16,10 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     url: 'https://raterunner.online',
     siteName: 'RateRunner',
-    title: 'RateRunner — 실시간 환율 + 송금 경로 비교',
-    description: 'Wise·페이팔·은행 송금 수수료 + 환율 통합 비교',
+    title: 'RateRunner | 공개 기준 환율과 송금 수수료 계산',
+    description: '공개 기준 환율과 사용자 입력 기반 송금 수수료 계산기. 송금사 견적이 아닙니다.',
   },
-  twitter: { card: 'summary_large_image', title: 'RateRunner', description: '실시간 환율 + 송금 비교' },
+  twitter: { card: 'summary_large_image', title: 'RateRunner', description: '공개 기준 환율과 수동 수수료 계산' },
   robots: { index: true, follow: true },
 };
 
