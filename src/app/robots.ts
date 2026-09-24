@@ -1,14 +1,6 @@
 import type { MetadataRoute } from 'next';
-const SITE = 'https://raterunner.online';
-const AI_BOTS = ['GPTBot', 'ChatGPT-User', 'OAI-SearchBot', 'ClaudeBot', 'Claude-Web', 'anthropic-ai',
-  'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Bytespider', 'CCBot',
-  'meta-externalagent', 'Applebot-Extended'];
+
+// Withhold the unpublished local candidate from crawlers pending source/editorial approval.
 export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: [
-      { userAgent: '*', allow: '/', disallow: ['/api/', '/_next/'] },
-      ...AI_BOTS.map(ua => ({ userAgent: ua, allow: '/' })),
-    ],
-    sitemap: [`${SITE}/sitemap.xml`], host: SITE,
-  };
+  return { rules: [{ userAgent: '*', disallow: '/' }] };
 }

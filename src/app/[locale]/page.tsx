@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import CurrencyConverter from '@/components/CurrencyConverter';
 import RateStatus from '@/components/RateStatus';
@@ -8,12 +9,15 @@ import { getReferenceRate } from '@/lib/reference-rate';
 
 interface Props { params: Promise<{ locale: string }> }
 export const revalidate = 300;
+const SUPPORTED_LOCALES = new Set(['ko', 'en']);
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  if (!SUPPORTED_LOCALES.has(locale)) return { robots: { index: false, follow: false } };
   return { title: 'RateRunner | Public exchange-rate ledger', description: 'Timestamped public reference exchange rates and a manual remittance fee worksheet. Not provider quotes.', alternates: { canonical: `/${locale}/` } };
 }
 export default async function Home({ params }: Props) {
   const { locale } = await params;
+  if (!SUPPORTED_LOCALES.has(locale)) notFound();
   setRequestLocale(locale);
   const snapshot = await fetchLiveRate('KRW');
   return <main className="ledger-shell">

@@ -20,7 +20,8 @@ export const metadata: Metadata = {
     description: '공개 기준 환율과 사용자 입력 기반 송금 수수료 계산기. 송금사 견적이 아닙니다.',
   },
   twitter: { card: 'summary_large_image', title: 'RateRunner', description: '공개 기준 환율과 수동 수수료 계산' },
-  robots: { index: true, follow: true },
+  // Local source-port gate: no editorial/live-rate accuracy sign-off or owner deployment approval.
+  robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

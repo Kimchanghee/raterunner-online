@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const locales = ['en', 'ko', 'ja'];
 const defaultLocale = 'en';
 
 export function middleware(request: NextRequest) {
@@ -16,7 +15,6 @@ export function middleware(request: NextRequest) {
   const acceptLang = request.headers.get('accept-language') || '';
   let locale = defaultLocale;
   if (acceptLang.toLowerCase().includes('ko')) locale = 'ko';
-  else if (acceptLang.toLowerCase().includes('ja')) locale = 'ja';
   else if (acceptLang.toLowerCase().includes('en')) locale = 'en';
 
   return NextResponse.redirect(new URL('/' + locale, request.url));
