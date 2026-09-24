@@ -5,10 +5,14 @@ const defaultLocale = 'en';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only handle the bare root path - everything else passes through
-  // (so /about/, /blog/ in public/ are served directly as static)
+  // Redirect only the bare root. Locale routes carry their language into the root layout;
+  // static /about/ and /blog/ paths pass through unchanged.
   if (pathname !== '/') {
-    return NextResponse.next();
+    const locale = /^\/(en|ko)(?:\/|$)/.exec(pathname)?.[1];
+    if (!locale) return NextResponse.next();
+    const headers = new Headers(request.headers);
+    headers.set('x-raterunner-locale', locale);
+    return NextResponse.next({ request: { headers } });
   }
 
   // Detect locale
@@ -21,5 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/'],
+  matcher: ['/', '/en/:path*', '/ko/:path*'],
 };

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { headers } from 'next/headers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -24,9 +25,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const locale = (await headers()).get('x-raterunner-locale') === 'en' ? 'en' : 'ko';
   return (
-    <html lang="ko">
+    <html lang={locale}>
       <head>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-W4S4GB2VLB" />
         <script
