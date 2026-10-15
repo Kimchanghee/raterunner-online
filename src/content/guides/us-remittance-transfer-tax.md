@@ -1,7 +1,7 @@
 ---
 title: "Does the US 1% remittance tax apply to my transfer?"
 seoTitle: "US 1% Remittance Transfer Tax: Who Pays and How to Avoid It"
-description: "Since 1 January 2026 the US charges a 1% excise tax on remittances funded with cash, money orders or cashier's checks. Who pays it, what is exempt, and what it costs."
+description: "Since 1 January 2026 the US charges a 1% excise tax on remittances funded with cash, money orders or cashier's checks. Who pays it, what is exempt, the cost."
 question: "us remittance tax 1 percent cash transfers"
 answer: "Only if you fund the transfer with cash, a money order, a cashier's check or a similar physical instrument. Since 1 January 2026, US law adds a 1% excise tax on those remittances. Transfers paid from a bank account or with a US-issued debit or credit card are exempt."
 published: 2026-10-15
@@ -48,7 +48,7 @@ In practice, if you send money through an app or website and pay from your US ba
 
 ## How much does 1% add, compared with the rest of the cost?
 
-On 500 dollars paid in cash, the tax is 5 dollars. That is not trivial next to the other costs of a transfer. In RateRunner's snapshot of 15 October 2026, the best ranked quotes for sending 1,000 US dollars to Mexico cost around 1% in total (fee plus [exchange-rate markup](/guides/exchange-rate-markup-explained/)), so paying in cash could roughly double the cost of an otherwise cheap transfer.
+On 500 dollars paid in cash, the tax is 5 dollars. That is not trivial next to the other costs of a transfer. In RateRunner's snapshot of 15 October 2026, the three best non-promotional quotes for sending 1,000 US dollars to Mexico cost about 1.0% to 1.5% in total (fee plus [exchange-rate markup](/guides/exchange-rate-markup-explained/)), so a 1% tax on a cash-funded transfer would add roughly as much again.
 
 The tax is a flat percentage, so it does not shrink for larger amounts the way flat fees do. On the other hand, the gap between the cheapest and the most expensive provider in most US corridors is several percentage points: choosing the provider matters more than the tax, but avoiding the tax is the easier saving if you have a bank account or US card. Check current totals in the [USD to MXN ledger](/send/usd-to-mxn/) or the [calculator](/).
 

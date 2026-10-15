@@ -1,7 +1,7 @@
 ---
 title: "How can freelancers get paid from abroad without losing 5%?"
 seoTitle: "Getting Paid from Abroad as a Freelancer: Cut FX and Fees"
-description: "Freelancers paid by foreign clients lose money in three places: platform fees, the conversion rate and receiving-bank charges. Where each comes from and how to shrink it."
+description: "Freelancers paid by foreign clients lose money in three places: platform fees, the conversion rate and receiving-bank charges. Where each comes from and fixes."
 question: "how to get paid from abroad as a freelancer"
 answer: "Invoice in a way that lets you control the currency conversion, and receive through local account details rather than a SWIFT wire or a payment wallet's default conversion. In RateRunner's 15 October 2026 snapshot, PayPal's transfer markups ran 3.05% to 5.84%, against under 1% for the best services."
 published: 2026-10-15

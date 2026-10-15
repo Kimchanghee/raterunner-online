@@ -1,7 +1,7 @@
 ---
 title: "What do banks really charge for an international transfer?"
 seoTitle: "Bank International Transfer Fees: What Banks Really Charge"
-description: "Bank international transfers carry an upfront fee, an exchange-rate markup and sometimes third-party charges. What 24 large banks quoted, and why no fee rarely means cheap."
+description: "Bank transfers abroad carry an upfront fee, an exchange-rate markup and sometimes third-party charges. What 24 large banks quoted, and why no fee misleads."
 question: "bank international transfer fees"
 answer: "More than the fee suggests. In RateRunner's 15 October 2026 snapshot, bank quotes for sending 1,000 had a median upfront fee of 5 but a median exchange-rate markup of 2.23%, for a median true cost of 3.06%, about twice the 1.41% median for transfer services."
 published: 2026-10-15

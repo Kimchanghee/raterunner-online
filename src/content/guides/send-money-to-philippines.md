@@ -1,7 +1,7 @@
 ---
 title: "What does it cost to send money to the Philippines?"
 seoTitle: "Send Money to the Philippines: Fees, Peso Markup, E-Wallets"
-description: "True cost of sending money to the Philippines from the US, UK, eurozone, Canada and Australia, plus InstaPay vs PESONet, e-wallet payouts and cash pickup trade-offs."
+description: "True cost of sending money to the Philippines from the US, UK, eurozone, Canada and Australia, plus InstaPay vs PESONet, e-wallet and cash pickup trade-offs."
 question: "cheapest way to send money to the philippines"
 answer: "It ranges from under 1% to over 6% depending on provider and amount. In RateRunner's 15 October 2026 snapshot, the best quotes for sending 1,000 to the Philippines cost 0.4% to 1.0%, while PayPal and some banks cost 5% to 7%."
 published: 2026-10-15

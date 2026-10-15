@@ -1,7 +1,7 @@
 ---
 title: "How long does an international money transfer take?"
 seoTitle: "How Long Do International Transfers Take? Minutes to Days"
-description: "Why some international transfers land in minutes and others take days: the last mile, cut-off times, weekends, compliance holds and payout rails, with dated data."
+description: "Why some international transfers land in minutes and others take days: the last mile, cut-off times, weekends, compliance holds and payout rails, with data."
 question: "how long does an international money transfer take"
 answer: "Anywhere from seconds to several business days. Swift reports that 75% of cross-border payments on its network reach the recipient's bank within 10 minutes, but crediting the recipient can take more than a day. Cut-off times, weekends, checks and the payout rail decide the rest."
 published: 2026-10-15

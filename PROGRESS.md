@@ -8,7 +8,7 @@ Branch: `v2-cloudflare-static`. Contract: `../CONTRACT.md`. Brief: `../BRIEFS.md
 - [x] M2 Design system: tokens (global.css, receipt.css), fonts (Plex Mono + Source Serif 4), Base layout with SEO head/consent/AdSense  (DESIGN_REFERENCES.md pending -> M8)
 - [~] M3 Core pages: home calculator + 40 corridor pages + /send/ index DONE; quote screening (48h / -1% markup) DONE; hidden-markup checker DONE
 - [~] M4 Trust pages: about, methodology, contact DONE; privacy, terms, disclaimer, 404 TODO
-- [~] M5 Guides: collection + /guides/ + [slug] template DONE; 5/12 written (markup, mid-market, swift, mexico, india); TODO philippines, freelancer, bank-wire-fees, limits-id, cash-pickup, timing, us-remittance-tax; RSS
+- [~] M5 Guides: collection + /guides/ + [slug] template DONE; 10 written; TODO transfer-limits-and-id-checks, cash-pickup-vs-bank-deposit (both linked already); RSS
 - [ ] M6 SEO files: sitemap, robots, llms.txt, ads.txt, IndexNow, OG images, JSON-LD
 - [ ] M7 Gate script + tests + refresh-build.ps1
 - [ ] M8 QA: build, check, gate, curl crawl, Playwright screenshots, scorecard before/after, measure.md
@@ -16,3 +16,6 @@ Branch: `v2-cloudflare-static`. Contract: `../CONTRACT.md`. Brief: `../BRIEFS.md
 
 ## Notes
 - Old tree had committed .env.local/.env.production (public Adsterra keys) -> deleted in M0.
+
+- Build: use `node node_modules/astro/astro.js build` (7-10 s). `pnpm build` hangs on this host (pnpm wrapper, not astro). Set ASTRO_TELEMETRY_DISABLED=1.
+
