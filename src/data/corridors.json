@@ -1,0 +1,291 @@
+{
+ "amounts": [
+  200,
+  1000,
+  5000
+ ],
+ "list": [
+  {
+   "from": "USD",
+   "to": "MXN"
+  },
+  {
+   "from": "USD",
+   "to": "INR"
+  },
+  {
+   "from": "USD",
+   "to": "PHP"
+  },
+  {
+   "from": "USD",
+   "to": "GTQ"
+  },
+  {
+   "from": "USD",
+   "to": "CNY"
+  },
+  {
+   "from": "USD",
+   "to": "VND"
+  },
+  {
+   "from": "USD",
+   "to": "PKR"
+  },
+  {
+   "from": "USD",
+   "to": "COP"
+  },
+  {
+   "from": "USD",
+   "to": "KRW"
+  },
+  {
+   "from": "USD",
+   "to": "BRL"
+  },
+  {
+   "from": "USD",
+   "to": "EUR"
+  },
+  {
+   "from": "USD",
+   "to": "GBP"
+  },
+  {
+   "from": "USD",
+   "to": "CAD"
+  },
+  {
+   "from": "USD",
+   "to": "JPY"
+  },
+  {
+   "from": "USD",
+   "to": "BDT"
+  },
+  {
+   "from": "USD",
+   "to": "EGP"
+  },
+  {
+   "from": "USD",
+   "to": "THB"
+  },
+  {
+   "from": "USD",
+   "to": "IDR"
+  },
+  {
+   "from": "USD",
+   "to": "AUD"
+  },
+  {
+   "from": "GBP",
+   "to": "INR"
+  },
+  {
+   "from": "GBP",
+   "to": "EUR"
+  },
+  {
+   "from": "GBP",
+   "to": "PKR"
+  },
+  {
+   "from": "GBP",
+   "to": "PHP"
+  },
+  {
+   "from": "GBP",
+   "to": "USD"
+  },
+  {
+   "from": "GBP",
+   "to": "PLN"
+  },
+  {
+   "from": "GBP",
+   "to": "ZAR"
+  },
+  {
+   "from": "EUR",
+   "to": "INR"
+  },
+  {
+   "from": "EUR",
+   "to": "USD"
+  },
+  {
+   "from": "EUR",
+   "to": "GBP"
+  },
+  {
+   "from": "EUR",
+   "to": "PHP"
+  },
+  {
+   "from": "EUR",
+   "to": "MAD"
+  },
+  {
+   "from": "EUR",
+   "to": "TRY"
+  },
+  {
+   "from": "CAD",
+   "to": "INR"
+  },
+  {
+   "from": "CAD",
+   "to": "PHP"
+  },
+  {
+   "from": "CAD",
+   "to": "USD"
+  },
+  {
+   "from": "CAD",
+   "to": "MXN"
+  },
+  {
+   "from": "AUD",
+   "to": "INR"
+  },
+  {
+   "from": "AUD",
+   "to": "PHP"
+  },
+  {
+   "from": "AUD",
+   "to": "USD"
+  },
+  {
+   "from": "AUD",
+   "to": "GBP"
+  }
+ ],
+ "currencies": {
+  "USD": {
+   "name": "US dollar",
+   "place": "United States",
+   "symbol": "$"
+  },
+  "GBP": {
+   "name": "British pound",
+   "place": "United Kingdom",
+   "symbol": "£"
+  },
+  "EUR": {
+   "name": "Euro",
+   "place": "the eurozone",
+   "symbol": "€"
+  },
+  "CAD": {
+   "name": "Canadian dollar",
+   "place": "Canada",
+   "symbol": "C$"
+  },
+  "AUD": {
+   "name": "Australian dollar",
+   "place": "Australia",
+   "symbol": "A$"
+  },
+  "MXN": {
+   "name": "Mexican peso",
+   "place": "Mexico",
+   "symbol": null
+  },
+  "INR": {
+   "name": "Indian rupee",
+   "place": "India",
+   "symbol": null
+  },
+  "PHP": {
+   "name": "Philippine peso",
+   "place": "the Philippines",
+   "symbol": null
+  },
+  "GTQ": {
+   "name": "Guatemalan quetzal",
+   "place": "Guatemala",
+   "symbol": null
+  },
+  "CNY": {
+   "name": "Chinese yuan",
+   "place": "China",
+   "symbol": null
+  },
+  "VND": {
+   "name": "Vietnamese dong",
+   "place": "Vietnam",
+   "symbol": null
+  },
+  "PKR": {
+   "name": "Pakistani rupee",
+   "place": "Pakistan",
+   "symbol": null
+  },
+  "COP": {
+   "name": "Colombian peso",
+   "place": "Colombia",
+   "symbol": null
+  },
+  "KRW": {
+   "name": "South Korean won",
+   "place": "South Korea",
+   "symbol": null
+  },
+  "BRL": {
+   "name": "Brazilian real",
+   "place": "Brazil",
+   "symbol": null
+  },
+  "JPY": {
+   "name": "Japanese yen",
+   "place": "Japan",
+   "symbol": null
+  },
+  "BDT": {
+   "name": "Bangladeshi taka",
+   "place": "Bangladesh",
+   "symbol": null
+  },
+  "EGP": {
+   "name": "Egyptian pound",
+   "place": "Egypt",
+   "symbol": null
+  },
+  "THB": {
+   "name": "Thai baht",
+   "place": "Thailand",
+   "symbol": null
+  },
+  "IDR": {
+   "name": "Indonesian rupiah",
+   "place": "Indonesia",
+   "symbol": null
+  },
+  "PLN": {
+   "name": "Polish zloty",
+   "place": "Poland",
+   "symbol": null
+  },
+  "ZAR": {
+   "name": "South African rand",
+   "place": "South Africa",
+   "symbol": null
+  },
+  "MAD": {
+   "name": "Moroccan dirham",
+   "place": "Morocco",
+   "symbol": null
+  },
+  "TRY": {
+   "name": "Turkish lira",
+   "place": "Turkey",
+   "symbol": null
+  }
+ }
+}

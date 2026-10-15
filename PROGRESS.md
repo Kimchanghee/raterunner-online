@@ -4,7 +4,7 @@ Branch: `v2-cloudflare-static`. Contract: `../CONTRACT.md`. Brief: `../BRIEFS.md
 
 ## Milestones
 - [x] M0 Remove old Next.js app, add package.json/.gitignore, PROGRESS.md, first push
-- [ ] M1 Scaffold: astro.config, tsconfig, wrangler.jsonc, site.config.ts, refresh script + real data snapshot
+- [x] M1 Scaffold: astro.config, tsconfig, wrangler.jsonc, site.config.ts, refresh script + real data snapshot (40 corridors x 200/1000/5000, asOf 2026-10-15T14:57Z), src/lib/cost.ts + tests (9 pass)
 - [ ] M2 Design system: tokens, fonts, Base layout (receipt/customs-ledger metaphor), DESIGN_REFERENCES.md
 - [ ] M3 Core pages: home calculator, corridor pages, hidden-markup explainer
 - [ ] M4 Trust pages: about, methodology, contact, privacy, terms, disclaimer, 404
