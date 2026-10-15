@@ -8,7 +8,7 @@ Branch: `v2-cloudflare-static`. Contract: `../CONTRACT.md`. Brief: `../BRIEFS.md
 - [x] M2 Design system: tokens (global.css, receipt.css), fonts (Plex Mono + Source Serif 4), Base layout with SEO head/consent/AdSense  (DESIGN_REFERENCES.md pending -> M8)
 - [~] M3 Core pages: home calculator + 40 corridor pages + /send/ index DONE; quote screening (48h / -1% markup) DONE; hidden-markup checker DONE
 - [~] M4 Trust pages: about, methodology, contact DONE; privacy, terms, disclaimer, 404 TODO
-- [~] M5 Guides: collection + /guides/ + [slug] template DONE; 10 written; TODO transfer-limits-and-id-checks, cash-pickup-vs-bank-deposit (both linked already); RSS
+- [~] M5 Guides: collection + /guides/ + [slug] template DONE; 12/12 written DONE; TODO RSS
 - [ ] M6 SEO files: sitemap, robots, llms.txt, ads.txt, IndexNow, OG images, JSON-LD
 - [ ] M7 Gate script + tests + refresh-build.ps1
 - [ ] M8 QA: build, check, gate, curl crawl, Playwright screenshots, scorecard before/after, measure.md
