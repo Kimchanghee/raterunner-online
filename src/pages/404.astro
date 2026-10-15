@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found (404) | RateRunner money transfer cost ledger" description="This RateRunner page does not exist. Use the calculator, browse the 40 corridor ledgers or read the guides to find the true cost of an international transfer." path="/404/" status404>
+  <section class="wrap nf">
+    <p class="label">Error 404 · no such entry in the ledger</p>
+    <h1>This page is not in the ledger</h1>
+    <p class="answer">The address may be mistyped, or a corridor may have been renamed. The links below cover everything RateRunner publishes.</p>
+    <ul class="nf-list">
+      <li><a href="/">Calculator</a>: true cost for any of the covered corridors and amounts</li>
+      <li><a href="/send/">All corridor ledgers</a>: ranked quotes by what the recipient gets</li>
+      <li><a href="/hidden-fx-markup/">Hidden markup checker</a>: test a quote you were given</li>
+      <li><a href="/guides/">Guides</a>: fees, markups, timing, limits and tax</li>
+    </ul>
+  </section>
+</Base>
+<style>
+  .nf { padding: var(--s-6) 0; max-width: 62rem; }
+  .nf h1 { margin: var(--s-3) 0; }
+  .answer { font-size: var(--t-lg); max-width: 60ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .nf-list { margin-top: var(--s-5); padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+  .nf-list li { padding: var(--s-3) 0; border-bottom: 1px dashed var(--rule); }
+</style>

@@ -1,0 +1,33 @@
+---
+import Doc from '../layouts/Doc.astro';
+import site from '../site.config.ts';
+---
+<Doc
+  title="Terms of use"
+  seoTitle="RateRunner Terms of Use: Indicative Quotes, No Advice, Links"
+  description="The terms for using RateRunner: quotes are indicative and dated, nothing here is financial advice, providers set their own prices and terms, and how content may be reused."
+  path="/terms/"
+  lede="By using RateRunner you accept that quotes are indicative snapshots with a collection time, that the final price is whatever the provider shows you before you pay, and that RateRunner is not a money transfer service."
+  updated="2026-10-16"
+>
+  <h2>What RateRunner is</h2>
+  <p>RateRunner is an information website that compares the cost of international money transfers. It does not send, hold or receive money, and it is not a party to any transfer you make with a provider.</p>
+
+  <h2>Accuracy of quotes</h2>
+  <p>Quotes come from public comparison data (see <a href="/methodology/">methodology</a>) and are shown with the time they were collected. Exchange rates move continuously and providers change fees and promotions without notice. Always confirm the final amount, fee and rate on the provider's own website before you pay. RateRunner is not liable for differences between a displayed quote and the price you are offered.</p>
+
+  <h2>No advice</h2>
+  <p>Nothing on this site is financial, legal or tax advice. Guides explain public rules and data in plain English; your situation may differ. See the <a href="/disclaimer/">disclaimer</a>.</p>
+
+  <h2>Links to other websites</h2>
+  <p>Links to providers and official sources are for convenience. RateRunner does not control those sites and is not responsible for their content, availability or terms. Some provider links may be affiliate links, marked "sponsored".</p>
+
+  <h2>Reuse of content</h2>
+  <p>You may quote short passages and cite figures from RateRunner with a link to the page and the date of the data. Bulk copying or automated scraping of the site is not permitted without written permission. Underlying quote data belongs to its original publishers.</p>
+
+  <h2>Availability</h2>
+  <p>The site is provided as is. It may be updated, interrupted or changed at any time.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about these terms: <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.</p>
+</Doc>

@@ -1,0 +1,27 @@
+---
+import Doc from '../layouts/Doc.astro';
+import site from '../site.config.ts';
+---
+<Doc
+  title="Disclaimer and affiliate disclosure"
+  seoTitle="RateRunner Disclaimer: Not Financial Advice, Affiliate Policy"
+  description="RateRunner is not financial advice and not a transfer provider. How quotes can differ from the final price, how affiliate commissions work, and why they never change ranking."
+  path="/disclaimer/"
+  lede="RateRunner is an independent comparison site, not a bank or money transfer service, and nothing here is financial advice. Rankings are always by what the recipient gets, and no provider can pay to change its position."
+  updated="2026-10-16"
+>
+  <h2>Not financial advice</h2>
+  <p>Figures, rankings and guides on RateRunner are general information. They do not take your circumstances into account. Before sending money, check the provider's final quote, terms, limits and regulatory status in your country.</p>
+
+  <h2>Quotes are indicative</h2>
+  <p>Each quote shows its collection time. Quotes from different providers may have been collected at different moments, while the mid-market rate moved; a promotional first-transfer rate may be shown where the data includes it and is labelled. The <a href="/methodology/">methodology</a> explains every calculation.</p>
+
+  <h2>Affiliate disclosure</h2>
+  <p>RateRunner may earn a commission when you use some providers through links marked "sponsored". At the time of writing, no affiliate links are active, and provider links point to their official homepages. When affiliate links are added, they will be labelled next to the link and in the site footer. Commissions never change the order of quotes, which is always by amount received.</p>
+
+  <h2>Advertising</h2>
+  <p>The site may display ads from Google AdSense. Advertisers have no influence on data or editorial content.</p>
+
+  <h2>Errors</h2>
+  <p>If you find a mistake, email <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>. Corrections are made promptly and noted on the page's updated date.</p>
+</Doc>
