@@ -42,6 +42,10 @@ const description = fitDescription([
   ` See fees, rate markups and recipient amounts.`,
   ` Compare fee and markup.`,
   ` Fees and markups itemised.`,
+  ` Fees, rate markups and recipient amounts.`,
+  ` Fees, rate markups and what the recipient actually gets.`,
+  ` Upfront fees, rate markups and what the recipient actually gets.`,
+  ` Upfront fees, exchange-rate markups and what the recipient actually gets.`,
 ]);
 const answer = `On ${longDate(fetched)}, the most a recipient in ${place(to)} got for ${money(h.amount, from, { dp: 0 })} was ${money(s.best.quote.received, to)} via ${s.best.quote.name}: a true cost of ${money(s.best.totalCost, from)} (${pct(s.best.totalPct)}) including fee and rate markup. The last of ${s.count} quotes cost ${pct(s.worst.totalPct)}.`;
 
