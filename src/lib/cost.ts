@@ -140,3 +140,23 @@ export function summarise(send: number, quotes: Quote[]): BandSummary | null {
     bankHiddenShare: avg(bankHidden),
   };
 }
+
+export interface ScreenRules { maxAgeHours: number; minMarkup: number }
+export const DEFAULT_RULES: ScreenRules = { maxAgeHours: 48, minMarkup: -1 };
+
+/**
+ * Split quotes into those we rank and those we set aside (shown, but not ranked):
+ *  - collected more than `maxAgeHours` before retrieval (too old to compare with fresh quotes)
+ *  - markup below `minMarkup` % (rate more than 1% better than mid-market: a data error or a one-off promotion)
+ */
+export function screen(quotes: Quote[], fetchedAt: string, rules: ScreenRules = DEFAULT_RULES): { ranked: Quote[]; setAside: { quote: Quote; reason: string }[] } {
+  const ranked: Quote[] = [];
+  const setAside: { quote: Quote; reason: string }[] = [];
+  for (const q of quotes) {
+    const age = ageHours(q.collectedAt, fetchedAt);
+    if (Number.isFinite(age) && age > rules.maxAgeHours) setAside.push({ quote: q, reason: `collected ${Math.round(age)} h before retrieval` });
+    else if (q.markup < rules.minMarkup) setAside.push({ quote: q, reason: `rate ${Math.abs(q.markup).toFixed(2)}% above mid-market` });
+    else ranked.push(q);
+  }
+  return { ranked, setAside };
+}

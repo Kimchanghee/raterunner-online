@@ -1,0 +1,202 @@
+---
+import '../styles/receipt.css';
+import { meta, quotes, slugOf, curName, placeShort, type CorridorView } from '../lib/data.ts';
+import { receiptHtml, ledgerRowsHtml, LEDGER_HEAD } from '../lib/render.ts';
+import ProviderCta from './ProviderCta.astro';
+
+interface Props { view: CorridorView; amount?: number; heading?: string; lockCorridor?: boolean }
+const { view, amount = 1000, lockCorridor = false } = Astro.props;
+const band = view.bands.find((b) => b.amount === amount) ?? view.headline!;
+const initialReceipt = receiptHtml({ from: view.from, to: view.to, send: band.amount, quotes: band.band.raw, fetchedAt: band.band.fetchedAt, mode: 'snapshot' });
+const initialRows = ledgerRowsHtml(band.amount, view.from, view.to, band.band.raw, band.band.fetchedAt);
+const groups = [...new Set(meta.list.map((c) => c.from))].map((f) => ({ from: f, items: meta.list.filter((c) => c.from === f) }));
+const bands = meta.amounts;
+const best = band.summary.best.quote;
+---
+<section class="calc" aria-labelledby="calc-h">
+  <form class="decl" id="rr-form" novalidate data-bands={JSON.stringify(bands)}>
+    <h2 id="calc-h" class="label decl-title">Declaration · Form RR-1</h2>
+    <div class="field">
+      <label for="rr-corridor"><span class="box">1</span> Corridor (send → receive)</label>
+      {lockCorridor ? (
+        <>
+          <select id="rr-corridor" name="corridor" disabled={false}>
+            <option value={slugOf(view.from, view.to)} selected>{view.from} → {view.to} · {curName(view.from)} to {placeShort(view.to)}</option>
+          </select>
+        </>
+      ) : (
+        <select id="rr-corridor" name="corridor">
+          {groups.map((g) => (
+            <optgroup label={`From ${curName(g.from)} (${g.from})`}>
+              {g.items.map((c) => (
+                <option value={slugOf(c.from, c.to)} selected={c.from === view.from && c.to === view.to}>{c.from} → {c.to} · {placeShort(c.to)}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      )}
+    </div>
+    <div class="field">
+      <label for="rr-amount"><span class="box">2</span> Amount you send <span class="cur" id="rr-cur">({view.from})</span></label>
+      <input id="rr-amount" name="amount" type="number" inputmode="decimal" min="10" max="1000000" step="any" value={band.amount} required aria-describedby="rr-amount-hint rr-amount-err" />
+      <p class="hint" id="rr-amount-hint">Between 10 and 1,000,000. Snapshot bands: {bands.map((b) => b.toLocaleString('en-US')).join(' / ')}; other amounts are fetched live.</p>
+      <p class="err" id="rr-amount-err" role="alert" hidden></p>
+    </div>
+    <div class="field quick" role="group" aria-label="Snapshot amounts">
+      {bands.map((b) => <button type="button" class="qb" data-amount={b} aria-pressed={b === band.amount ? 'true' : 'false'}>{b.toLocaleString('en-US')}</button>)}
+    </div>
+    <button class="btn" type="submit" id="rr-go"><span class="box inv">3</span> Itemise the cost</button>
+    <p class="hint">Quotes are indicative and come from Wise public comparison data, which lists Wise alongside banks and other services. Ranking is always by what the recipient gets.</p>
+  </form>
+
+  <div class="out" id="rr-out" aria-live="polite" aria-busy="false">
+    <div id="rr-receipt" set:html={initialReceipt} />
+    <div id="rr-cta"><ProviderCta alias={best.alias} name={best.name} /></div>
+  </div>
+</section>
+
+<section class="calc-ledger" aria-labelledby="ledger-h">
+  <h2 id="ledger-h"><span id="rr-ledger-title">Every quote for {band.amount.toLocaleString('en-US')} {view.from} → {view.to}</span></h2>
+  <p class="ledger-lede">Sorted by what the recipient gets. “True cost” adds the upfront fee to the money lost in the exchange rate versus the mid-market rate at the time each quote was collected.</p>
+  <div class="ledger-scroll" tabindex="0" role="region" aria-labelledby="ledger-h">
+    <table class="ledger" id="rr-ledger">
+      <caption class="visually-hidden">Provider quotes ranked by amount received</caption>
+      <Fragment set:html={LEDGER_HEAD} />
+      <tbody id="rr-rows" set:html={initialRows} />
+    </table>
+  </div>
+</section>
+
+<script>
+  import { receiptHtml, ledgerRowsHtml, emptyHtml } from '../lib/render.ts';
+  import type { Quote } from '../lib/cost.ts';
+
+  type Band = { fetchedAt: string; providers: Quote[] };
+  type Snap = { from: string; to: string; bands: Record<string, Band> };
+
+  const form = document.getElementById('rr-form') as HTMLFormElement | null;
+  if (form) {
+    const sel = form.querySelector<HTMLSelectElement>('#rr-corridor')!;
+    const amt = form.querySelector<HTMLInputElement>('#rr-amount')!;
+    const err = form.querySelector<HTMLElement>('#rr-amount-err')!;
+    const go = form.querySelector<HTMLButtonElement>('#rr-go')!;
+    const cur = document.getElementById('rr-cur')!;
+    const out = document.getElementById('rr-out')!;
+    const receipt = document.getElementById('rr-receipt')!;
+    const rows = document.getElementById('rr-rows')!;
+    const title = document.getElementById('rr-ledger-title')!;
+    const cta = document.getElementById('rr-cta')!;
+    const bands: number[] = JSON.parse(form.dataset.bands || '[]');
+    const cache = new Map<string, Snap>();
+
+    const parse = (slug: string) => { const [f, , t] = slug.split('-'); return { from: f!.toUpperCase(), to: t!.toUpperCase() }; };
+
+    async function snapshot(slug: string): Promise<Snap | null> {
+      if (cache.has(slug)) return cache.get(slug)!;
+      try {
+        const r = await fetch(`/data/q/${slug}.json`);
+        if (!r.ok) return null;
+        const j = (await r.json()) as Snap; cache.set(slug, j); return j;
+      } catch { return null; }
+    }
+
+    async function live(from: string, to: string, amount: number): Promise<Quote[] | null> {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 7000);
+      try {
+        const r = await fetch(`https://api.wise.com/v4/comparisons/?sourceCurrency=${from}&targetCurrency=${to}&sendAmount=${amount}`, { signal: ctl.signal });
+        if (!r.ok) return null;
+        const j = await r.json();
+        const outQ: Quote[] = [];
+        for (const p of j.providers ?? []) {
+          const q = (p.quotes ?? [])[0];
+          if (!q || typeof q.fee !== 'number' || typeof q.markup !== 'number' || typeof q.rate !== 'number' || !(q.receivedAmount > 0)) continue;
+          const d = q.deliveryEstimation?.duration;
+          outQ.push({ alias: String(p.alias), name: String(p.name), type: p.type === 'bank' ? 'bank' : 'provider', fee: q.fee, markup: q.markup, rate: q.rate, received: q.receivedAmount, isMid: !!q.isConsideredMidMarketRate, collectedAt: String(q.dateCollected), delivery: d && d.min ? { min: d.min, max: d.max ?? d.min } : null });
+        }
+        return outQ.length >= 2 ? outQ : null;
+      } catch { return null; } finally { clearTimeout(t); }
+    }
+
+    function nearest(n: number): number {
+      return bands.reduce((a, b) => (Math.abs(b - n) < Math.abs(a - n) ? b : a), bands[0]!);
+    }
+
+    function setPressed(n: number) {
+      form!.querySelectorAll<HTMLButtonElement>('.qb').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.amount) === n)));
+    }
+
+    function validate(): number | null {
+      const v = Number(amt.value);
+      let msg = '';
+      if (amt.value.trim() === '' || !Number.isFinite(v)) msg = 'Enter the amount you want to send, as a number.';
+      else if (v < 10) msg = 'Enter at least 10. Below that, fixed fees make any comparison meaningless.';
+      else if (v > 1000000) msg = 'Enter 1,000,000 or less. Larger transfers are usually quoted individually.';
+      err.hidden = !msg; err.textContent = msg;
+      amt.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      return msg ? null : Math.round(v * 100) / 100;
+    }
+
+    async function run() {
+      const amount = validate();
+      if (amount === null) { amt.focus(); return; }
+      const slug = sel.value; const { from, to } = parse(slug);
+      go.disabled = true; out.setAttribute('aria-busy', 'true'); go.lastChild!.textContent = ' Fetching quotes…';
+      setPressed(amount);
+      const isBand = bands.includes(amount);
+      const snap = await snapshot(slug);
+      let mode: 'snapshot' | 'live' | 'snapshot-fallback' = 'snapshot';
+      let send = amount; let qs: Quote[] | null = null; let fetchedAt = new Date().toISOString();
+      const liveQ = await live(from, to, amount);
+      if (liveQ) { qs = liveQ; mode = 'live'; }
+      else if (snap) {
+        const b = isBand ? amount : nearest(amount);
+        const band = snap.bands[String(b)];
+        if (band) { qs = band.providers; send = b; fetchedAt = band.fetchedAt; mode = isBand ? 'snapshot' : 'snapshot-fallback'; }
+      }
+      if (!qs) {
+        receipt.innerHTML = emptyHtml({ from, to }); rows.innerHTML = ''; cta.hidden = true;
+      } else {
+        receipt.innerHTML = receiptHtml({ from, to, send, quotes: qs, fetchedAt, mode, requested: amount });
+        rows.innerHTML = ledgerRowsHtml(send, from, to, qs, fetchedAt);
+        cta.hidden = true; // provider CTA is server-rendered for the initial corridor only
+        title.textContent = `Every quote for ${send.toLocaleString('en-US')} ${from} → ${to}`;
+        (window as any).rrTrack?.('tool_used', { tool: 'cost_calculator', corridor: `${from}-${to}`, amount, mode });
+      }
+      cur.textContent = `(${from})`;
+      go.disabled = false; out.setAttribute('aria-busy', 'false'); go.lastChild!.textContent = ' Itemise the cost';
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); run(); });
+    form.querySelectorAll<HTMLButtonElement>('.qb').forEach((b) => b.addEventListener('click', () => { amt.value = b.dataset.amount!; run(); }));
+    sel.addEventListener('change', () => { const { from } = parse(sel.value); cur.textContent = `(${from})`; });
+  }
+</script>
+
+<style>
+  .calc { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-6); align-items: start; }
+  .decl { border: 2px solid var(--ink); background: var(--slip); padding: var(--s-5); }
+  .decl-title { margin: 0 0 var(--s-4); padding-bottom: var(--s-2); border-bottom: 1px solid var(--ink); }
+  .field { margin-bottom: var(--s-4); }
+  .field label { display: flex; align-items: center; gap: var(--s-2); font: 500 var(--t-sm) var(--mono); margin-bottom: var(--s-2); }
+  .box { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border: 1.5px solid var(--ink); font: 600 var(--t-xs) var(--mono); }
+  .box.inv { border-color: var(--slip); margin-right: 0.4em; }
+  .cur { color: var(--ink-3); }
+  select, input[type='number'] {
+    width: 100%; min-height: 48px; font: 500 var(--t-md) var(--mono); font-variant-numeric: tabular-nums; color: var(--ink);
+    background: #fff; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 0 var(--s-2);
+  }
+  input[type='number'] { font-size: var(--t-xl); }
+  input[aria-invalid='true'] { border-bottom-color: var(--stamp); background: var(--stamp-tint); }
+  .hint { font-size: var(--t-xs); color: var(--ink-3); margin: var(--s-2) 0 0; font-family: var(--mono); line-height: 1.5; }
+  .err { color: var(--stamp); font-size: var(--t-sm); margin: var(--s-2) 0 0; font-weight: 600; }
+  .quick { display: flex; gap: 0; }
+  .qb { flex: 1; min-height: 44px; font: 500 var(--t-sm) var(--mono); background: transparent; border: 1px solid var(--ink); margin-left: -1px; cursor: pointer; color: var(--ink); border-radius: 0; }
+  .qb[aria-pressed='true'] { background: var(--ink); color: var(--slip); }
+  .decl .btn { width: 100%; margin-top: var(--s-2); }
+  .out[aria-busy='true'] #rr-receipt { opacity: 0.55; }
+  .calc-ledger { margin-top: var(--s-7); }
+  .calc-ledger h2 { margin-top: 0; }
+  .ledger-lede { color: var(--ink-2); font-size: var(--t-sm); max-width: var(--measure); }
+  @media (max-width: 56rem) { .calc { grid-template-columns: 1fr; } }
+  @media (max-width: 40rem) { .decl { padding: var(--s-4); } }
+</style>

@@ -79,3 +79,19 @@ test('durations and ages', () => {
   assert.equal(humanDuration('garbage'), null);
   assert.equal(ageHours('2026-10-14T12:00:00Z', '2026-10-15T00:00:00Z'), 12);
 });
+
+test('screen sets aside old and implausible quotes', async () => {
+  const { screen } = await import('../src/lib/cost.ts');
+  const base = { alias: 'x', name: 'X', type: 'provider', fee: 0, rate: 1, received: 100, isMid: false, delivery: null };
+  const qs = [
+    { ...base, alias: 'fresh', markup: 1, collectedAt: '2026-10-15T10:00:00Z' },
+    { ...base, alias: 'old', markup: 1, collectedAt: '2026-10-12T10:00:00Z' },
+    { ...base, alias: 'promo', markup: -0.4, collectedAt: '2026-10-15T10:00:00Z' },
+    { ...base, alias: 'bad', markup: -8.5, collectedAt: '2026-10-15T10:00:00Z' },
+  ];
+  const r = screen(qs, '2026-10-15T12:00:00Z');
+  assert.deepEqual(r.ranked.map((q) => q.alias), ['fresh', 'promo']);
+  assert.deepEqual(r.setAside.map((s) => s.quote.alias), ['old', 'bad']);
+  assert.match(r.setAside[0].reason, /74 h/);
+  assert.match(r.setAside[1].reason, /8\.50% above/);
+});

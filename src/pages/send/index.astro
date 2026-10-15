@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import { allCorridors, meta, curName, placeShort, quotes } from '../../lib/data.ts';
+import { overview } from '../../lib/insights.ts';
+import { pct, longDate, stamp, money } from '../../lib/format.ts';
+import { abs } from '../../lib/seo.ts';
+import site from '../../site.config.ts';
+
+const views = allCorridors();
+const o = overview(1000);
+const sources = [...new Set(meta.list.map((c) => c.from))];
+const asOf = quotes.asOf!;
+const pctAt = (v: (typeof views)[number], a: number) => v.bands.find((b) => b.amount === a)?.summary;
+const ld = [
+  {
+    '@type': 'Dataset',
+    '@id': abs('/send/') + '#dataset',
+    name: 'International money transfer true-cost ledger, 40 corridors',
+    description: `Indicative quotes for ${o.corridors} corridors at 200, 1,000 and 5,000 units of the source currency, itemised into upfront fee and exchange-rate markup.`,
+    url: abs('/send/'),
+    dateModified: asOf,
+    isAccessibleForFree: true,
+    creator: { '@id': `${site.url}/#organization` },
+    isBasedOn: 'https://wise.com/gb/compare/',
+    variableMeasured: ['upfront fee', 'exchange-rate markup', 'true total cost', 'amount received'],
+  },
+];
+---
+<Base
+  title="Money Transfer Costs by Corridor: 40 Routes Compared"
+  description={`True cost of sending money on ${o.corridors} corridors at 200, 1,000 and 5,000: best and worst quotes, fee vs exchange-rate markup, dated ${longDate(asOf)}.`.slice(0, 160)}
+  path="/send/"
+  og="send"
+  ld={ld}
+  crumbs={[{ name: 'Home', path: '/' }, { name: 'Corridors', path: '/send/' }]}
+>
+  <div class="wrap">
+    <header class="s-head">
+      <h1>How much does it cost to send money on each corridor?</h1>
+      <p class="answer">On {longDate(asOf)}, the cheapest quote for sending 1,000 cost a median {pct(o.medianBestPct)} across {o.corridors} corridors, from {pct(o.cheapest[0] ? o.cheapest[0].headline!.summary.best.totalPct : NaN)} on {o.cheapest[0]?.from} → {o.cheapest[0]?.to} to {pct(o.priciest[0] ? o.priciest[0].headline!.summary.best.totalPct : NaN)} on {o.priciest[0]?.from} → {o.priciest[0]?.to}.</p>
+      <p class="prose small">Each row shows the best and worst true cost (upfront fee plus exchange-rate markup) among the providers listed for that corridor in Wise public comparison data, retrieved between {stamp(o.oldestFetch!)} and {stamp(o.newestFetch!)}. Open a corridor for every quote, a chart and page-specific findings.</p>
+    </header>
+
+    {sources.map((src) => (
+      <section aria-labelledby={`from-${src}`}>
+        <h2 id={`from-${src}`}>Sending {curName(src).replace('Euro', 'euros').replace(/(dollar|pound)$/, '$1s')} ({src})</h2>
+        <div class="ledger-scroll" tabindex="0" role="region" aria-labelledby={`from-${src}`}>
+          <table class="ledger">
+            <thead>
+              <tr>
+                <th scope="col">Corridor</th>
+                <th scope="col">Best at 200</th>
+                <th scope="col">Best at 1,000</th>
+                <th scope="col">Worst at 1,000</th>
+                <th scope="col">Best at 5,000</th>
+                <th scope="col">Most to recipient (1,000)</th>
+                <th scope="col">Providers</th>
+              </tr>
+            </thead>
+            <tbody>
+              {views.filter((v) => v.from === src).map((v) => {
+                const a = pctAt(v, 200), b = pctAt(v, 1000), c = pctAt(v, 5000);
+                return (
+                  <tr>
+                    <td class="name"><a href={v.url}>{v.from} → {v.to}</a> <span class="tag">{placeShort(v.to)}</span></td>
+                    <td>{a ? pct(a.best.totalPct) : '—'}</td>
+                    <td><strong>{b ? pct(b.best.totalPct) : '—'}</strong></td>
+                    <td class="cost">{b ? pct(b.worst.totalPct) : '—'}</td>
+                    <td>{c ? pct(c.best.totalPct) : '—'}</td>
+                    <td class="name">{b ? `${b.best.quote.name} · ${money(b.best.quote.received, v.to)}` : '—'}</td>
+                    <td>{v.providerCount}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))}
+
+    <section class="prose">
+      <h2>How to read this ledger</h2>
+      <p>“Best” is the lowest true cost among listed providers, which is also the quote that delivers the most to the recipient for that amount. A corridor with a low best figure and a high worst figure is one where the choice of provider matters most. Bands are fixed at 200, 1,000 and 5,000 so that small-transfer fees and large-transfer rate margins both show up; your own amount can be checked in the <a href="/">calculator</a>. The full method is on the <a href="/methodology/">methodology page</a>.</p>
+    </section>
+  </div>
+</Base>
+<style>
+  .s-head { padding: var(--s-5) 0; max-width: 62rem; }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .small { font-size: var(--t-sm); color: var(--ink-2); }
+</style>

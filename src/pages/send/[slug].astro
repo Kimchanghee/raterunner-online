@@ -1,0 +1,186 @@
+---
+import Base from '../../layouts/Base.astro';
+import Calculator from '../../components/Calculator.astro';
+import CostChart from '../../components/CostChart.astro';
+import Faq from '../../components/Faq.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { allCorridors, related, curName, place, Place, placeShort, referenceMid, quotes, type CorridorView } from '../../lib/data.ts';
+import { corridorFindings } from '../../lib/insights.ts';
+import { buildLines, impliedMarkup } from '../../lib/cost.ts';
+import { money, pct, rate, longDate, stamp, isoDate } from '../../lib/format.ts';
+import { ledgerRowsHtml, LEDGER_HEAD } from '../../lib/render.ts';
+import { destinations } from '../../lib/destinations.ts';
+import { faqLd, abs } from '../../lib/seo.ts';
+import { fitDescription, pluralCurrency } from '../../lib/text.ts';
+import { getCollection } from 'astro:content';
+import site from '../../site.config.ts';
+
+export function getStaticPaths() {
+  return allCorridors().map((v) => ({ params: { slug: v.slug }, props: { view: v } }));
+}
+const { view } = Astro.props as { view: CorridorView };
+const { from, to } = view;
+const h = view.headline!;
+const s = h.summary;
+const fetched = view.latestFetch!;
+const m = (n: number, c: string) => money(n, c);
+const findings = corridorFindings(view, { money: m, pct: (n) => pct(n) });
+const ref = referenceMid(from, to);
+const bestMid = s.best.midAtCollection;
+const dest = destinations[to];
+const rel = related(view);
+const allGuides = await getCollection('guides');
+const guideLinks = allGuides.filter((g) => g.data.corridors.includes(view.slug) || (dest?.guide && g.id === dest.guide));
+const coreGuides = allGuides.filter((g) => ['exchange-rate-markup-explained', 'mid-market-rate', 'bank-international-wire-fees'].includes(g.id));
+const linkGuides = [...new Map([...guideLinks, ...coreGuides].map((g) => [g.id, g])).values()].slice(0, 5);
+
+const fromName = curName(from);
+const title = `Send ${from} to ${to}: True Cost, Fees & FX Markup Compared`;
+const description = fitDescription([
+  `Sending ${money(h.amount, from, { dp: 0 })} to ${placeShort(to)}: true cost ran from ${pct(s.best.totalPct)} to ${pct(s.worst.totalPct)} across ${s.count} quotes on ${longDate(fetched)}.`,
+  ` Fees, rate markups and what the recipient gets.`,
+  ` See fees, rate markups and recipient amounts.`,
+  ` Compare fee and markup.`,
+  ` Fees and markups itemised.`,
+]);
+const answer = `On ${longDate(fetched)}, the most a recipient in ${place(to)} got for ${money(h.amount, from, { dp: 0 })} was ${money(s.best.quote.received, to)} via ${s.best.quote.name}: a true cost of ${money(s.best.totalCost, from)} (${pct(s.best.totalPct)}) including fee and rate markup. The last of ${s.count} quotes cost ${pct(s.worst.totalPct)}.`;
+
+const faq = [
+  { q: `Which provider gave the most for ${money(h.amount, from, { dp: 0 })} sent to ${placeShort(to)}?`, a: `${s.best.quote.name}, with ${money(s.best.quote.received, to)} delivered, in the snapshot retrieved ${stamp(h.band.fetchedAt)}. Its upfront fee was ${money(s.best.quote.fee, from)} and its rate markup ${pct(s.best.quote.markup)}.` },
+  { q: `How much of the cost of sending ${from} to ${to} is hidden in the exchange rate?`, a: `For the ${s.count} quotes on ${money(h.amount, from, { dp: 0 })}, rate markups ranged from ${pct(Math.min(...h.band.providers.map((q) => q.markup)))} to ${pct(Math.max(...h.band.providers.map((q) => q.markup)))} of the amount converted. ${s.zeroFeeWithMarkup} quote${s.zeroFeeWithMarkup === 1 ? '' : 's'} charged no upfront fee but still had a markup above 0.5%.` },
+  { q: `How current are these ${from} to ${to} quotes?`, a: `RateRunner retrieved them on ${stamp(fetched)}. Each provider quote also carries its own collection time, shown in the tables, and quotes older than 24 hours are flagged. They are indicative; the price you are offered at checkout can differ.` },
+];
+
+const ld = [
+  {
+    '@type': 'Dataset',
+    '@id': abs(view.url) + '#dataset',
+    name: `${from} to ${to} money transfer cost quotes`,
+    description: `Indicative quotes for sending ${from} to ${to} at ${view.bands.map((b) => b.amount).join(', ')} ${from}, itemised into upfront fee and exchange-rate markup and ranked by amount received.`,
+    url: abs(view.url),
+    dateModified: fetched,
+    temporalCoverage: isoDate(fetched),
+    isAccessibleForFree: true,
+    creator: { '@id': `${site.url}/#organization` },
+    isBasedOn: 'https://wise.com/gb/compare/',
+    variableMeasured: ['upfront fee', 'exchange-rate markup', 'true total cost', 'amount received'],
+    distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: abs(`/data/q/${view.slug}.json`) }],
+  },
+  faqLd(faq),
+];
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Corridors', path: '/send/' },
+  { name: `${from} → ${to}`, path: view.url },
+];
+---
+<Base title={title} description={description} path={view.url} og={`send-${view.slug}`} ld={ld} crumbs={crumbs}>
+  <div class="wrap">
+    <header class="c-head">
+      <p class="label">Corridor {from} → {to} · {fromName} to {curName(to)}</p>
+      <h1>What does it cost to send {pluralCurrency(fromName)} to {place(to)}?</h1>
+      <p class="answer">{answer}</p>
+      {view.anyStale && <p class="note stale">Some bands could not be refreshed on the last run and show their last good snapshot, with the original retrieval time.</p>}
+    </header>
+
+    <Calculator view={view} amount={h.amount} />
+
+    <section aria-labelledby="bands-h">
+      <h2 id="bands-h">Does the cheapest option change with the amount?</h2>
+      <div class="ledger-scroll" tabindex="0" role="region" aria-labelledby="bands-h">
+        <table class="ledger">
+          <caption>Best and worst true cost by amount, {from} → {to}. Retrieved {stamp(fetched)}.</caption>
+          <thead><tr><th scope="col">You send</th><th scope="col">Most to recipient</th><th scope="col">Best cost</th><th scope="col">Worst cost</th><th scope="col">Recipient gets (best)</th><th scope="col">Gap best vs worst</th><th scope="col">Quotes</th></tr></thead>
+          <tbody>
+            {view.bands.map((b) => (
+              <tr>
+                <td>{money(b.amount, from, { dp: 0 })}</td>
+                <td class="name">{b.summary.best.quote.name}</td>
+                <td>{pct(b.summary.best.totalPct)}</td>
+                <td class="cost">{pct(b.summary.worst.totalPct)}</td>
+                <td><strong>{money(b.summary.best.quote.received, to)}</strong></td>
+                <td>{money(b.summary.spreadTarget, to)}</td>
+                <td>{b.summary.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="find-h">
+      <h2 id="find-h">What the {from} → {to} numbers show</h2>
+      <ul class="findings prose">
+        {findings.map((f) => <li>{f}</li>)}
+      </ul>
+      <CostChart send={h.amount} from={from} to={to} quotes={h.band.providers} title={`True cost as a share of ${money(h.amount, from, { dp: 0 })}, ${from} → ${to}, by provider (lower is better). Retrieved ${stamp(h.band.fetchedAt)}.`} />
+    </section>
+
+    {ref && (
+      <section class="prose" aria-labelledby="ref-h">
+        <h2 id="ref-h">How does the quoted mid-market rate compare with the ECB reference?</h2>
+        <p>The European Central Bank reference rate for {from}/{to} on {longDate(ref.date)} was <span class="num">{rate(ref.rate)}</span>. The mid-market rate implied by the top quote at its collection time was <span class="num">{rate(bestMid)}</span>, a difference of <span class="num">{pct(-impliedMarkup(bestMid, ref.rate))}</span>. ECB rates are published once per working day around 16:00 CET, so they drift from live market rates during the day; RateRunner uses them only as a cross-check, never to rank providers.</p>
+      </section>
+    )}
+
+    <AdSlot id="incontent1" />
+
+    {view.bands.filter((b) => b.amount !== h.amount).map((b) => (
+      <section aria-labelledby={`band-${b.amount}`}>
+        <h2 id={`band-${b.amount}`}>Every quote for {money(b.amount, from, { dp: 0 })} → {to}</h2>
+        <div class="ledger-scroll" tabindex="0" role="region" aria-labelledby={`band-${b.amount}`}>
+          <table class="ledger">
+            <caption>Retrieved {stamp(b.band.fetchedAt)}. Sorted by what the recipient gets.</caption>
+            <Fragment set:html={LEDGER_HEAD} />
+            <tbody set:html={ledgerRowsHtml(b.amount, from, to, b.band.raw, b.band.fetchedAt)} />
+          </table>
+        </div>
+      </section>
+    ))}
+
+    {dest && (
+      <section class="prose" aria-labelledby="dest-h">
+        <h2 id="dest-h">What to check before paying out in {placeShort(to)}</h2>
+        <p>{dest.text} Source: <a href={dest.source.url}>{dest.source.name}</a>.</p>
+      </section>
+    )}
+
+    <section class="prose" aria-labelledby="read-h">
+      <h2 id="read-h">Read next</h2>
+      <ul>
+        {linkGuides.map((g) => <li><a href={`/guides/${g.id}/`}>{g.data.title}</a></li>)}
+        <li><a href="/hidden-fx-markup/">Check the hidden markup on a rate you were offered</a></li>
+        <li><a href="/methodology/">How RateRunner calculates true cost</a></li>
+      </ul>
+    </section>
+
+    <Faq items={faq} />
+
+    <section aria-labelledby="rel-h">
+      <h2 id="rel-h">Related corridors</h2>
+      <ul class="rel">
+        {rel.map((r) => <li><a href={r.url}>{r.from} → {r.to}</a> <span class="mono">{curName(r.from)} to {placeShort(r.to)}</span></li>)}
+      </ul>
+    </section>
+
+    <section class="sources prose" aria-labelledby="src-h">
+      <h2 id="src-h">Sources</h2>
+      <ul>
+        <li>Indicative provider quotes: <a href={quotes.sourceUrl}>Wise public comparison data</a> (retrieved {stamp(fetched)}). Wise collects quotes from listed banks and services and is itself listed.</li>
+        {ref && <li>Reference rate: <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html">European Central Bank euro reference rates</a> via <a href="https://frankfurter.dev/">Frankfurter</a> ({longDate(ref.date)}).</li>}
+        <li>Raw data for this page: <a href={`/data/q/${view.slug}.json`}>{view.slug}.json</a></li>
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .c-head { padding: var(--s-5) 0; max-width: 62rem; }
+  .c-head .label { margin: 0 0 var(--s-2); }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .findings li { margin-bottom: var(--s-3); }
+  .rel { list-style: none; padding: 0; columns: 3 14rem; margin: 0; }
+  .rel li { padding: var(--s-2) 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+  .rel .mono { display: block; font-size: var(--t-xs); color: var(--ink-3); }
+  .sources { font-size: var(--t-sm); }
+</style>

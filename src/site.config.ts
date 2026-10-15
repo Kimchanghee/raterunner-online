@@ -15,6 +15,10 @@ export const site = {
   bingVerification: (env.PUBLIC_BING_VERIFICATION as string | undefined) ?? '',
   naverVerification: (env.PUBLIC_NAVER_VERIFICATION as string | undefined) ?? '',
   adsenseClient: 'ca-pub-4490818204529253',
+  adSlots: {
+    incontent1: (env.PUBLIC_ADSENSE_SLOT_INCONTENT1 as string | undefined) ?? '',
+    incontent2: (env.PUBLIC_ADSENSE_SLOT_INCONTENT2 as string | undefined) ?? '',
+  } as Record<string, string>,
   indexNowKey: '6be73d7d86230e4c2f51173b799c8184',
   // Affiliate links render only when non-empty. Until then neutral official links are shown (no rel=sponsored).
   affiliates: {

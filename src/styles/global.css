@@ -1,0 +1,104 @@
+/* RateRunner — "remittance receipt / customs ledger" design tokens.
+   Paper, ink, ruled lines, tabular mono numerals. One stamp red reserved for hidden cost. */
+:root {
+  --paper: #f3efe4;        /* desk / page */
+  --slip: #fffdf6;         /* receipt paper */
+  --ink: #1a1915;          /* primary text  (15.9:1 on paper) */
+  --ink-2: #514d43;        /* secondary text (7.6:1 on paper) */
+  --ink-3: #6b665a;        /* tertiary, labels (5.3:1 on paper) */
+  --rule: #cbc3ae;         /* ledger rules */
+  --rule-strong: #1a1915;
+  --stamp: #a3161b;        /* hidden markup / cost (7.1:1 on slip) */
+  --stamp-tint: #f6e3df;
+  --carbon: #1d3a8a;       /* links, focus: carbon-copy blue (9.4:1 on slip) */
+  --ok: #24623a;           /* best value marker (6.9:1 on slip) */
+  --ok-tint: #e3efe3;
+  --warn-tint: #f7ecd0;
+
+  --serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  /* type scale (1.25 minor third-ish, tuned for reading at 18px) */
+  --t-xs: 0.78rem;   /* 14px labels */
+  --t-sm: 0.89rem;   /* 16px */
+  --t-md: 1rem;      /* 18px body */
+  --t-lg: 1.22rem;   /* 22px */
+  --t-xl: 1.6rem;    /* 29px */
+  --t-2xl: clamp(1.9rem, 1.2rem + 2.6vw, 2.75rem);
+
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem;
+  --measure: 68ch;
+  --wide: 76rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 112.5%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: var(--t-md); line-height: 1.6;
+  font-optical-sizing: auto;
+}
+img, svg { max-width: 100%; height: auto; }
+a { color: var(--carbon); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--carbon); outline-offset: 2px; }
+::selection { background: #d9e1f6; }
+
+h1, h2, h3 { line-height: 1.18; font-weight: 640; letter-spacing: -0.01em; margin: 0 0 var(--s-3); }
+h1 { font-size: var(--t-2xl); }
+h2 { font-size: var(--t-xl); margin-top: var(--s-7); }
+h3 { font-size: var(--t-lg); margin-top: var(--s-5); }
+p, ul, ol { margin: 0 0 var(--s-4); }
+li { margin-bottom: var(--s-2); }
+
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num { white-space: nowrap; }
+.label {
+  font-family: var(--mono); font-size: var(--t-xs); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500;
+}
+.skip { position: absolute; left: -999px; top: 0; background: var(--slip); padding: var(--s-3); z-index: 10; }
+.skip:focus { left: var(--s-3); top: var(--s-3); }
+.wrap { max-width: var(--wide); margin: 0 auto; padding: 0 var(--s-4); }
+.prose { max-width: var(--measure); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Ledger table: ruled, tabular, scrolls inside its own box on small screens */
+.ledger-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-top: 2px solid var(--rule-strong); border-bottom: 2px solid var(--rule-strong); background: var(--slip); }
+.ledger-scroll:focus-visible { outline-offset: -3px; }
+table.ledger { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+table.ledger caption { text-align: left; font-family: var(--serif); font-size: var(--t-sm); color: var(--ink-2); padding: var(--s-3) var(--s-3) var(--s-2); caption-side: top; }
+table.ledger th, table.ledger td { padding: 0.55rem var(--s-3); border-bottom: 1px solid var(--rule); text-align: right; vertical-align: top; white-space: nowrap; }
+table.ledger th:first-child, table.ledger td:first-child { text-align: left; }
+table.ledger thead th { font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 500; border-bottom: 1px solid var(--rule-strong); }
+table.ledger tbody tr:last-child td { border-bottom: 0; }
+table.ledger td.cost { color: var(--stamp); }
+table.ledger tr.best td { background: var(--ok-tint); }
+table.ledger .tag { font-size: var(--t-xs); color: var(--ink-3); margin-left: 0.4em; }
+table.ledger td.name { white-space: normal; min-width: 9rem; }
+
+/* Stamp: a ruled, uppercase mark (not a pill) */
+.stamp { display: inline-block; font-family: var(--mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.08em; border: 1.5px solid currentColor; padding: 0 0.4em; line-height: 1.6; transform: rotate(-1.5deg); }
+.stamp.red { color: var(--stamp); }
+.stamp.green { color: var(--ok); }
+.stamp.amber { color: #7a5200; }
+
+.note { border-left: 3px solid var(--rule-strong); padding: var(--s-2) var(--s-4); background: var(--slip); font-size: var(--t-sm); color: var(--ink-2); }
+.note.stale { border-color: #7a5200; background: var(--warn-tint); color: var(--ink); }
+
+.btn { font: 600 var(--t-sm)/1 var(--mono); letter-spacing: 0.04em; text-transform: uppercase; background: var(--ink); color: var(--slip); border: 2px solid var(--ink); min-height: 44px; padding: 0 var(--s-5); cursor: pointer; border-radius: 0; }
+.btn:hover { background: #000; }
+.btn[disabled] { opacity: 0.55; cursor: progress; }
+.btn.ghost { background: transparent; color: var(--ink); }
+
+.ad-slot { min-height: 280px; margin: var(--s-7) 0; display: grid; place-items: center; border-top: 1px dashed var(--rule); border-bottom: 1px dashed var(--rule); }
+.ad-slot::before { content: 'Advertisement'; font: var(--t-xs) var(--mono); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; align-self: start; padding-top: var(--s-2); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+@media (max-width: 40rem) {
+  html { font-size: 106.25%; }
+  h2 { margin-top: var(--s-6); }
+}
+@media print { .ad-slot, .site-nav, .site-foot nav { display: none; } body { background: #fff; } }
+table.ledger tr.aside-h th { text-align: left; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 500; background: var(--paper); border-top: 1px solid var(--rule-strong); }
+table.ledger tr.aside td { color: var(--ink-3); background: var(--paper); }

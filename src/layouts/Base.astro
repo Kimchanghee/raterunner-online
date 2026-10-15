@@ -1,0 +1,167 @@
+---
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-600.css';
+import '@fontsource-variable/source-serif-4/wght.css';
+import '../styles/global.css';
+import site from '../site.config.ts';
+import { abs, orgLd, websiteLd, breadcrumbLd, graph, type Crumb } from '../lib/seo.ts';
+import { quotes } from '../lib/data.ts';
+import { stamp } from '../lib/format.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string; // canonical path with trailing slash
+  og?: string; // og image name (without .png) under /og/
+  ld?: object[]; // page-specific JSON-LD nodes
+  crumbs?: Crumb[];
+  type?: 'website' | 'article';
+  status404?: boolean;
+}
+const { title, description, path, og = 'default', ld = [], crumbs, type = 'website', status404 = false } = Astro.props;
+const canonical = abs(path);
+const ogImage = abs(`/og/${og}.png`);
+const nodes: object[] = [orgLd(), websiteLd(), ...ld];
+if (crumbs && crumbs.length > 1) nodes.push(breadcrumbLd(crumbs));
+const ldJson = JSON.stringify(graph(...nodes)).replace(/</g, '\\u003c');
+const ga = site.ga4Id;
+const consentRegions = JSON.stringify(site.consentDeniedRegions);
+const nav = [
+  { href: '/', label: 'Calculator' },
+  { href: '/send/', label: 'Corridors' },
+  { href: '/hidden-fx-markup/', label: 'Hidden markup' },
+  { href: '/guides/', label: 'Guides' },
+  { href: '/methodology/', label: 'Method' },
+];
+const here = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {!status404 && <link rel="canonical" href={canonical} />}
+  <meta name="robots" content={status404 ? 'noindex' : 'index, follow, max-image-preview:large'} />
+  <meta name="theme-color" content="#f3efe4" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title="RateRunner guides" href="/rss.xml" />
+  <meta property="og:type" content={type} />
+  <meta property="og:site_name" content={site.name} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+  <meta name="google-adsense-account" content={site.adsenseClient} />
+  {site.gscVerification && <meta name="google-site-verification" content={site.gscVerification} />}
+  {site.bingVerification && <meta name="msvalidate.01" content={site.bingVerification} />}
+  {site.naverVerification && <meta name="naver-site-verification" content={site.naverVerification} />}
+  <script type="application/ld+json" set:html={ldJson} />
+  <script is:inline define:vars={{ ga, consentRegions }}>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+    var regions = JSON.parse(consentRegions);
+    gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', region: regions, wait_for_update: 500 });
+    gtag('consent', 'default', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted', wait_for_update: 500 });
+    window.rrTrack = function (name, params) { try { if (ga) gtag('event', name, params || {}); } catch (e) {} };
+    if (ga) {
+      var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga; document.head.appendChild(s);
+      gtag('js', new Date()); gtag('config', ga);
+    }
+  </script>
+  <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.adsenseClient}`} crossorigin="anonymous"></script>
+  <slot name="head" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-head">
+    <div class="wrap head-row">
+      <a class="brand" href="/" aria-label="RateRunner home">
+        <span class="brand-mark" aria-hidden="true">RR</span>
+        <span class="brand-text"><span class="brand-name">RateRunner</span><span class="brand-sub">transfer cost ledger</span></span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <ul>
+          {nav.map((n) => (
+            <li><a href={n.href} aria-current={(n.href === '/' ? here === '/' : here.startsWith(n.href)) ? 'page' : undefined}>{n.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </header>
+  {crumbs && crumbs.length > 1 && (
+    <nav class="wrap crumbs" aria-label="Breadcrumb">
+      <ol>
+        {crumbs.map((c, i) => (
+          <li>{i < crumbs.length - 1 ? <a href={c.path}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
+        ))}
+      </ol>
+    </nav>
+  )}
+  <main id="main">
+    <slot />
+  </main>
+  <footer class="site-foot">
+    <div class="wrap foot-grid">
+      <div class="foot-about">
+        <p class="label">RateRunner · raterunner.online</p>
+        <p>RateRunner itemises the full cost of sending money abroad: upfront fee plus exchange-rate markup against the mid-market rate, ranked by what the recipient gets.</p>
+        <p class="foot-data">Quotes: indicative, from <a href="https://wise.com/gb/compare/">Wise public comparison data</a>{quotes.asOf && <> · snapshot <span class="num">{stamp(quotes.asOf)}</span></>}. Not financial advice. Check the final quote with the provider before you send.</p>
+        <p class="foot-data"><strong>Disclosure:</strong> RateRunner may earn a commission if you use a provider through a link marked “sponsored”. Commissions never change the ranking, which is always by what the recipient gets. See <a href="/disclaimer/">disclaimer</a>.</p>
+      </div>
+      <nav aria-label="Site">
+        <ul>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/methodology/">Methodology &amp; data</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/privacy/">Privacy</a></li>
+          <li><a href="/terms/">Terms</a></li>
+          <li><a href="/disclaimer/">Disclaimer</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
+
+<style>
+  .site-head { background: var(--slip); border-bottom: 2px solid var(--ink); }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); min-height: 64px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: var(--s-3); color: var(--ink); text-decoration: none; min-height: 44px; }
+  .brand-mark { font: 600 0.95rem/1 var(--mono); border: 2px solid var(--ink); padding: 0.35rem 0.4rem; letter-spacing: 0.04em; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-weight: 680; font-size: 1.15rem; letter-spacing: -0.01em; }
+  .brand-sub { font: var(--t-xs) var(--mono); color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .site-nav ul { display: flex; gap: 0; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .site-nav li { margin: 0; }
+  .site-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-3); font: 500 var(--t-sm) var(--mono); color: var(--ink); text-decoration: none; border-bottom: 3px solid transparent; }
+  .site-nav a:hover { border-bottom-color: var(--rule); }
+  .site-nav a[aria-current='page'] { border-bottom-color: var(--stamp); }
+  .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0 var(--s-2); padding: var(--s-3) 0 0; margin: 0 auto; font: var(--t-xs) var(--mono); color: var(--ink-3); }
+  .crumbs li { margin: 0; }
+  .crumbs li + li::before { content: '/'; margin-right: var(--s-2); color: var(--rule); }
+  .crumbs a { color: var(--ink-2); }
+  main { min-height: 60vh; }
+  .site-foot { margin-top: var(--s-8); border-top: 2px solid var(--ink); background: var(--slip); padding: var(--s-6) 0 var(--s-7); font-size: var(--t-sm); color: var(--ink-2); }
+  .foot-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--s-6); }
+  .foot-grid ul { list-style: none; padding: 0; margin: 0; columns: 2; }
+  .foot-grid li { margin: 0; }
+  .foot-grid nav a { display: inline-flex; min-height: 44px; align-items: center; font-family: var(--mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+  .foot-data { font-size: var(--t-xs); line-height: 1.55; }
+  @media (max-width: 52rem) {
+    .foot-grid { grid-template-columns: 1fr; }
+    .site-nav { width: 100%; overflow-x: auto; }
+    .site-nav ul { flex-wrap: nowrap; }
+    .site-nav a { padding: 0 var(--s-2); white-space: nowrap; }
+    .head-row { padding-top: var(--s-2); }
+  }
+</style>

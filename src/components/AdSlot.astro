@@ -1,0 +1,14 @@
+---
+// In-content ad unit. Renders only when a real AdSense slot ID is configured (PUBLIC_ADSENSE_SLOT_<ID>),
+// so no empty placeholder boxes ship before approval. Fixed min-height prevents layout shift.
+import site from '../site.config.ts';
+interface Props { id: 'incontent1' | 'incontent2' }
+const { id } = Astro.props;
+const slot = site.adSlots[id] ?? '';
+---
+{slot && (
+  <aside class="ad-slot" aria-label="Advertisement">
+    <ins class="adsbygoogle" style="display:block;width:100%;min-height:250px" data-ad-client={site.adsenseClient} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+)}

@@ -1,0 +1,108 @@
+---
+import Base from '../layouts/Base.astro';
+import Calculator from '../components/Calculator.astro';
+import Faq from '../components/Faq.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { corridorView, quotes, curName, placeShort } from '../lib/data.ts';
+import { overview, bestPct } from '../lib/insights.ts';
+import { pct, longDate, stamp } from '../lib/format.ts';
+import { faqLd } from '../lib/seo.ts';
+import { getCollection } from 'astro:content';
+import site from '../site.config.ts';
+
+const view = corridorView('USD', 'MXN');
+const o = overview(1000);
+const asOf = quotes.asOf!;
+const guides = (await getCollection('guides')).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime()).slice(0, 6);
+const answer = `Fee plus exchange-rate markup. In RateRunner's ${longDate(asOf)} snapshot of ${o.quotes} quotes across ${o.corridors} corridors, the cheapest way to send 1,000 cost a median ${pct(o.medianBestPct)} of the amount; listed banks averaged ${pct(o.bankAvgPct ?? NaN)}.`;
+const faq = [
+  { q: 'What is the true cost of a money transfer?', a: 'The true cost is the upfront fee plus the exchange-rate markup: the gap between the rate you are given and the mid-market rate, multiplied by the amount converted. RateRunner adds both and ranks providers by what the recipient actually gets.' },
+  { q: 'Is a transfer with no fee free?', a: `Not necessarily. In the ${longDate(asOf)} snapshot, ${o.zeroFeeWithMarkup} of ${o.zeroFeeQuotes} quotes that charged no upfront fee on 1,000 still priced in an exchange-rate markup above 0.5%.` },
+  { q: 'Where do the quotes come from?', a: 'From Wise public comparison data, which collects indicative quotes from banks and transfer services, including Wise itself. RateRunner does not scrape bank websites. Each quote shows when it was collected; confirm the final quote with the provider before you send.' },
+];
+const ld = [
+  {
+    '@type': 'WebApplication', '@id': `${site.url}/#calculator`, name: 'RateRunner transfer cost calculator', url: `${site.url}/`,
+    applicationCategory: 'FinanceApplication', operatingSystem: 'Any', isAccessibleForFree: true,
+    description: 'Itemises the true cost of an international money transfer, fee plus exchange-rate markup, and ranks providers by what the recipient gets.',
+    publisher: { '@id': `${site.url}/#organization` },
+  },
+  faqLd(faq),
+];
+---
+<Base
+  title="Money Transfer Cost Calculator: Fees + Hidden FX Markup"
+  description="See what sending money abroad really costs: upfront fee plus exchange-rate markup, ranked by what the recipient gets, across 40 corridors with dated quotes."
+  path="/"
+  og="home"
+  ld={ld}
+>
+  <div class="wrap">
+    <header class="intro">
+      <h1>What does an international money transfer really cost?</h1>
+      <p class="answer">{answer}</p>
+    </header>
+    <Calculator view={view} amount={1000} />
+
+    <section aria-labelledby="corr-h">
+      <h2 id="corr-h">Which corridors were cheapest and dearest to send 1,000?</h2>
+      <p class="prose">Best available true cost for sending 1,000 units of the source currency, per corridor, from the snapshot retrieved {stamp(o.newestFetch!)}. A low figure means at least one listed provider was close to the mid-market rate with a small fee; it says nothing about the other providers in that corridor.</p>
+      <div class="two">
+        <div class="ledger-scroll" tabindex="0" role="region" aria-label="Cheapest corridors">
+          <table class="ledger">
+            <caption>Lowest best-quote cost</caption>
+            <thead><tr><th scope="col">Corridor</th><th scope="col">Best cost</th><th scope="col">Provider</th></tr></thead>
+            <tbody>
+              {o.cheapest.map((v) => (
+                <tr><td><a href={v.url}>{v.from} → {v.to}</a></td><td>{pct(bestPct(v))}</td><td>{v.headline!.summary.best.quote.name}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="ledger-scroll" tabindex="0" role="region" aria-label="Most expensive corridors">
+          <table class="ledger">
+            <caption>Highest best-quote cost</caption>
+            <thead><tr><th scope="col">Corridor</th><th scope="col">Best cost</th><th scope="col">Provider</th></tr></thead>
+            <tbody>
+              {o.priciest.map((v) => (
+                <tr><td><a href={v.url}>{v.from} → {v.to}</a></td><td class="cost">{pct(bestPct(v))}</td><td>{v.headline!.summary.best.quote.name}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p><a href="/send/">All {o.corridors} corridors, with 200 / 1,000 / 5,000 bands →</a></p>
+    </section>
+
+    <section class="prose" aria-labelledby="nofee-h">
+      <h2 id="nofee-h">Why is “no fee” not the same as free?</h2>
+      <p>Because the price can sit inside the exchange rate. In the {longDate(asOf)} snapshot, {o.zeroFeeQuotes} of {o.quotes} quotes for 1,000 charged no upfront fee, and {o.zeroFeeWithMarkup} of those still applied a rate markup above 0.5%. Across all quotes, the median share of the true cost hidden in the rate was {o.medianHiddenShare !== null ? `${Math.round(o.medianHiddenShare * 100)}%` : 'not available'}.</p>
+      <p>The receipt above separates the two lines so you can see them. The <a href="/hidden-fx-markup/">hidden markup checker</a> does the same for any rate a bank or app offers you.</p>
+    </section>
+
+    <AdSlot id="incontent1" />
+
+    <section aria-labelledby="guides-h">
+      <h2 id="guides-h">Guides to the parts of the bill nobody itemises</h2>
+      <ol class="guide-list">
+        {guides.map((g) => (
+          <li><a href={`/guides/${g.id}/`}>{g.data.title}</a><span class="gl-meta">updated {longDate(g.data.updated)}</span></li>
+        ))}
+      </ol>
+      <p><a href="/guides/">All guides →</a></p>
+    </section>
+
+    <Faq items={faq} />
+  </div>
+</Base>
+
+<style>
+  .intro { padding: var(--s-6) 0 var(--s-5); max-width: 60rem; }
+  .intro h1 { margin-bottom: var(--s-4); }
+  .answer { font-size: var(--t-lg); line-height: 1.5; color: var(--ink); max-width: 60ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); margin: var(--s-4) 0; }
+  .guide-list { padding-left: 1.4em; max-width: var(--measure); }
+  .guide-list li { padding: var(--s-2) 0; border-bottom: 1px solid var(--rule); }
+  .gl-meta { display: block; font: var(--t-xs) var(--mono); color: var(--ink-3); }
+  @media (max-width: 52rem) { .two { grid-template-columns: 1fr; } }
+</style>

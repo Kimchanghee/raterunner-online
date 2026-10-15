@@ -1,0 +1,35 @@
+---
+import site from '../site.config.ts';
+interface Props { alias: string; name: string }
+const { alias, name } = Astro.props;
+const aff = site.affiliates[alias] ?? '';
+const official = site.officialSites[alias] ?? '';
+const href = aff || official;
+let host = '';
+try { host = href ? new URL(href).host : ''; } catch { host = ''; }
+---
+{href && (
+  <div class="cta">
+    {aff ? (
+      <>
+        <a class="btn" href={aff} rel="sponsored nofollow noopener" target="_blank" data-outbound={host}>Check today's {name} quote</a>
+        <p class="disc"><strong>Sponsored link.</strong> RateRunner may earn a commission if you use {name} through this link. It does not change the ranking above.</p>
+      </>
+    ) : (
+      <>
+        <a class="btn ghost" href={official} rel="noopener" target="_blank" data-outbound={host}>Confirm the live quote on {host.replace(/^www\./, '')}</a>
+        <p class="disc">Plain link to the provider's official site. No commission.</p>
+      </>
+    )}
+  </div>
+)}
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('.cta a[data-outbound]').forEach((a) =>
+    a.addEventListener('click', () => (window as any).rrTrack?.(a.rel.includes('sponsored') ? 'outbound_affiliate_click' : 'outbound_click', { destination: a.dataset.outbound })),
+  );
+</script>
+<style>
+  .cta { margin-top: var(--s-4); }
+  .cta .btn { display: inline-flex; align-items: center; text-decoration: none; }
+  .disc { font-size: var(--t-xs); color: var(--ink-3); margin: var(--s-2) 0 0; font-family: var(--mono); }
+</style>

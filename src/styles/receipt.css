@@ -1,0 +1,41 @@
+/* Receipt slip: torn top/bottom edge, ruled lines, mono figures. */
+.receipt {
+  --tear: 10px;
+  position: relative; background: var(--slip); color: var(--ink);
+  padding: calc(var(--s-5) + var(--tear)) var(--s-5) calc(var(--s-4) + var(--tear));
+  min-height: 30rem;
+}
+.receipt-empty { min-height: 12rem; }
+.r-head { border-bottom: 1px dashed var(--ink-3); padding-bottom: var(--s-3); margin-bottom: var(--s-3); }
+.r-head .label { margin: 0 0 var(--s-2); }
+.r-best { margin: 0; font-size: var(--t-lg); line-height: 1.3; }
+.r-type { font: var(--t-xs) var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-left: 0.3em; }
+.r-lines { margin: 0; font-family: var(--mono); font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+.r-lines > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); padding: 0.42rem 0; border-bottom: 1px dotted var(--rule); }
+.r-lines dt { color: var(--ink-2); }
+.r-lines dd { margin: 0; text-align: right; white-space: nowrap; }
+.r-sub dt, .r-sub dd { color: var(--ink-3); font-size: var(--t-xs); }
+.r-hidden dt, .r-hidden dd { color: var(--stamp); }
+.r-why { display: inline-block; font-size: var(--t-xs); border: 1px solid currentColor; padding: 0 0.3em; margin-left: 0.3em; letter-spacing: 0.04em; text-transform: uppercase; }
+.r-pct { color: inherit; opacity: 0.85; margin-left: 0.35em; }
+.r-total { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink) !important; font-weight: 600; margin-top: var(--s-2); }
+.r-total dt { color: var(--ink); text-transform: uppercase; letter-spacing: 0.06em; }
+.r-total dd { color: var(--stamp); }
+.r-gets { border-bottom: 3px double var(--ink) !important; font-size: var(--t-lg); font-weight: 600; padding: var(--s-3) 0 !important; }
+.r-gets dt { color: var(--ink); font-size: var(--t-sm); text-transform: uppercase; letter-spacing: 0.06em; }
+.r-gap { font-size: var(--t-sm); margin: var(--s-3) 0 0; }
+.r-foot { font: var(--t-xs)/1.5 var(--mono); color: var(--ink-3); margin: var(--s-4) 0 0; }
+.r-foot .stamp { transform: none; margin-right: 0.3em; }
+.rank { color: var(--ink-3); display: inline-block; min-width: 1.7em; }
+@media (max-width: 40rem) {
+  .receipt { padding-left: var(--s-4); padding-right: var(--s-4); min-height: 31rem; }
+  .r-lines > div { flex-wrap: wrap; }
+}
+.receipt::before, .receipt::after {
+  content: ''; position: absolute; left: 0; right: 0; height: var(--tear); pointer-events: none;
+  background:
+    linear-gradient(135deg, var(--paper) calc(var(--tear) / 2), transparent 0) 0 0 / var(--tear) var(--tear) repeat-x,
+    linear-gradient(-135deg, var(--paper) calc(var(--tear) / 2), transparent 0) 0 0 / var(--tear) var(--tear) repeat-x;
+}
+.receipt::before { top: 0; }
+.receipt::after { bottom: 0; transform: scaleY(-1); }
