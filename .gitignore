@@ -10,3 +10,4 @@ qa/*.png
 *.log
 .wrangler/
 qa/*.log
+public/og/
