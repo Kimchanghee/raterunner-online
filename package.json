@@ -1,31 +1,28 @@
 {
-  "name": "raterunner",
-  "version": "0.1.0",
+  "name": "raterunner-online",
+  "version": "2.0.0",
   "private": true,
-  "description": "Currency exchange & remittance comparison (KR/EN)",
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
-    "start": "next start",
-    "type-check": "tsc --noEmit",
-    "fetch-rates": "tsx scripts/fetch-rates.ts",
-    "deploy": "npm run fetch-rates && npm run build && cdk deploy --require-approval never"
+    "dev": "astro dev",
+    "refresh": "node scripts/refresh.mjs",
+    "og": "node scripts/og.mjs",
+    "build": "astro build",
+    "preview": "astro preview --port 4321",
+    "check": "astro check",
+    "gate": "node scripts/gate.mjs",
+    "test": "node --test tests/"
   },
   "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next-intl": "^3.20.0",
-    "tailwindcss": "^3.4.13",
-    "recharts": "^2.13.0"
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/source-serif-4": "^5.3.1",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "astro": "^5.18.2"
   },
   "devDependencies": {
-    "@types/node": "^22.7.5",
-    "@types/react": "^19.0.0",
-    "typescript": "^5.6.3",
-    "tsx": "^4.19.1",
-    "aws-cdk-lib": "^2.160.0",
-    "postcss": "^8.4.47",
-    "autoprefixer": "^10.4.20"
+    "@astrojs/check": "^0.9.10",
+    "@resvg/resvg-js": "^2.6.2",
+    "typescript": "^7.0.2"
   }
 }
