@@ -1,0 +1,46 @@
+---
+import Doc from '../layouts/Doc.astro';
+import site from '../site.config.ts';
+import { abs } from '../lib/seo.ts';
+const ld = [{ '@type': 'AboutPage', '@id': abs('/about/') + '#page', url: abs('/about/'), name: 'About RateRunner', about: { '@id': `${site.url}/#organization` }, dateModified: '2026-10-15' }];
+---
+<Doc
+  title="About RateRunner"
+  seoTitle="About RateRunner: Independent Money Transfer Cost Ledger"
+  description="Who runs RateRunner, why it itemises the fee and the hidden exchange-rate markup of international transfers, and the editorial standards behind every number."
+  path="/about/"
+  lede="RateRunner is an independent website that itemises what an international money transfer really costs: the upfront fee plus the exchange-rate markup against the mid-market rate, ranked by what the recipient actually gets."
+  updated="2026-10-15"
+  ld={ld}
+>
+  <h2>Why this exists</h2>
+  <p>Most transfer comparisons lead with the fee, because the fee is the number providers advertise. The larger cost is often the exchange rate. A bank that charges no fee but gives you a rate 3% below the mid-market rate has taken 30 out of every 1,000 converted, and that money never appears on a receipt. RateRunner prints that receipt: one line for the fee, one line for the markup, one total, and the amount that arrives.</p>
+  <p>The site started from a simple rule: rank by what the recipient gets, never by what a provider pays us. If a provider is cheaper, it ranks higher. If it is not, no commercial arrangement changes that.</p>
+
+  <h2>What RateRunner publishes</h2>
+  <ul>
+    <li>A <a href="/">calculator</a> that itemises the true cost for 40 corridors and any amount from 10 to 1,000,000.</li>
+    <li><a href="/send/">Corridor pages</a> with every quote at 200, 1,000 and 5,000, page-specific findings and the raw data file.</li>
+    <li>A <a href="/hidden-fx-markup/">hidden markup checker</a> for any rate a bank or app offers you.</li>
+    <li><a href="/guides/">Guides</a> on the parts of a transfer that are rarely itemised, each sourced and dated.</li>
+  </ul>
+
+  <h2>Editorial standards</h2>
+  <ul>
+    <li><strong>Numbers come from data, not memory.</strong> Every figure on a corridor page is computed at build time from a dated snapshot. Guides state the snapshot date for any figure they quote.</li>
+    <li><strong>Dates are shown, not hidden.</strong> Each quote carries the time it was collected. Quotes older than 48 hours, or with rates implausibly far above mid-market, are set aside and labelled rather than ranked. See the <a href="/methodology/">methodology</a>.</li>
+    <li><strong>Unavailable means unavailable.</strong> If a refresh fails, the last good snapshot stays with its real date. RateRunner never fills gaps with estimates.</li>
+    <li><strong>No invented experience.</strong> RateRunner does not publish testimonials, reviews or star ratings, and guides do not claim first-hand use of a provider.</li>
+    <li><strong>Sources are linked.</strong> Rules and definitions link to regulators, central banks or the payment system operators that publish them.</li>
+    <li><strong>Corrections.</strong> Report an error to <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>. Confirmed errors are fixed and the page’s “updated” date changes only when content actually changes.</li>
+  </ul>
+
+  <h2>Independence and money</h2>
+  <p>RateRunner is not owned by any bank or money transfer provider. The site is funded by advertising (Google AdSense) and may in future use affiliate links with transfer services. Any such link is marked “sponsored”, carries a disclosure next to it, and has no effect on ranking. Until an affiliate link is configured, provider links are plain links to official sites. Details are in the <a href="/disclaimer/">disclaimer</a>.</p>
+
+  <h2>Where the quotes come from</h2>
+  <p>Provider quotes come from Wise’s public comparison data, which collects indicative quotes from banks and transfer services, including Wise itself. RateRunner reads that data, does the arithmetic, screens out stale or implausible quotes and ranks the rest by amount received. Reference rates for cross-checks come from the European Central Bank via Frankfurter. RateRunner does not scrape bank websites.</p>
+
+  <h2>Contact</h2>
+  <p>Email <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>. More on the <a href="/contact/">contact page</a>.</p>
+</Doc>

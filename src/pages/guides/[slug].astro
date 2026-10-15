@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import Faq from '../../components/Faq.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { longDate, isoDate } from '../../lib/format.ts';
+import { abs, faqLd } from '../../lib/seo.ts';
+import { allCorridors } from '../../lib/data.ts';
+import site from '../../site.config.ts';
+
+export async function getStaticPaths() {
+  const guides = (await getCollection('guides')).filter((g) => g.data.status !== 'draft');
+  return guides.map((g) => ({ params: { slug: g.id }, props: { entry: g, all: guides } }));
+}
+const { entry, all } = Astro.props as { entry: CollectionEntry<'guides'>; all: CollectionEntry<'guides'>[] };
+const d = entry.data;
+const { Content } = await render(entry);
+const path = `/guides/${entry.id}/`;
+const rel = d.related.map((id) => all.find((g) => g.id === id)).filter((g): g is CollectionEntry<'guides'> => !!g);
+const corr = allCorridors().filter((v) => d.corridors.includes(v.slug));
+const ld = [
+  {
+    '@type': 'Article',
+    '@id': abs(path) + '#article',
+    headline: d.title,
+    description: d.description,
+    url: abs(path),
+    mainEntityOfPage: abs(path),
+    datePublished: isoDate(d.published),
+    dateModified: isoDate(d.updated),
+    inLanguage: 'en',
+    author: { '@id': `${site.url}/#organization` },
+    publisher: { '@id': `${site.url}/#organization` },
+    image: abs(`/og/guide-${entry.id}.png`),
+    citation: d.sources.map((s) => s.url),
+  },
+  ...(d.faq.length ? [faqLd(d.faq)] : []),
+];
+---
+<Base title={d.seoTitle} description={d.description} path={path} og={`guide-${entry.id}`} type="article" ld={ld}
+  crumbs={[{ name: 'Home', path: '/' }, { name: 'Guides', path: '/guides/' }, { name: d.title, path }]}>
+  <article class="wrap guide">
+    <header class="g-head">
+      <p class="label">Guide · data as of <time datetime={isoDate(d.data_asof)}>{longDate(d.data_asof)}</time></p>
+      <h1>{d.title}</h1>
+      <p class="answer">{d.answer}</p>
+      <p class="g-meta mono">Published <time datetime={isoDate(d.published)}>{longDate(d.published)}</time> · Updated <time datetime={isoDate(d.updated)}>{longDate(d.updated)}</time> · By RateRunner (<a href="/about/">editorial standards</a>)</p>
+    </header>
+    <div class="g-grid">
+      <div class="prose g-body">
+        <Content />
+      </div>
+      {corr.length > 0 && (
+        <aside class="g-side" aria-label="Live corridor data">
+          <p class="label">Check live numbers</p>
+          <ul>
+            {corr.map((v) => <li><a href={v.url}>{v.from} → {v.to} ledger</a></li>)}
+          </ul>
+        </aside>
+      )}
+    </div>
+    <AdSlot id="incontent2" />
+    <Faq items={d.faq} />
+    <section class="prose g-sources" aria-labelledby="g-src">
+      <h2 id="g-src">Sources</h2>
+      <ol>
+        {d.sources.map((s) => <li><a href={s.url}>{s.name}</a></li>)}
+      </ol>
+    </section>
+    {rel.length > 0 && (
+      <section class="prose" aria-labelledby="g-rel">
+        <h2 id="g-rel">Related guides</h2>
+        <ul>{rel.map((g) => <li><a href={`/guides/${g.id}/`}>{g.data.title}</a></li>)}</ul>
+      </section>
+    )}
+  </article>
+</Base>
+<style>
+  .g-head { padding: var(--s-5) 0 var(--s-4); max-width: 62rem; border-bottom: 1px solid var(--rule); margin-bottom: var(--s-5); }
+  .g-head .label { margin: 0 0 var(--s-2); }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .g-meta { font-size: var(--t-xs); color: var(--ink-3); }
+  .g-grid { display: grid; grid-template-columns: minmax(0, 1fr) 15rem; gap: var(--s-7); align-items: start; }
+  .g-side { position: sticky; top: var(--s-4); border-top: 2px solid var(--ink); padding-top: var(--s-3); font-family: var(--mono); font-size: var(--t-sm); }
+  .g-side ul { list-style: none; padding: 0; margin: 0; }
+  .g-side li { margin: 0; border-bottom: 1px solid var(--rule); }
+  .g-side a { display: block; padding: var(--s-2) 0; min-height: 44px; }
+  .g-body :global(h2) { margin-top: var(--s-6); }
+  .g-body :global(table) { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: var(--t-xs); font-variant-numeric: tabular-nums; background: var(--slip); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); margin: var(--s-4) 0 var(--s-2); display: block; overflow-x: auto; }
+  .g-body :global(th), .g-body :global(td) { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+  .g-body :global(thead th) { text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); font-weight: 500; border-bottom: 1px solid var(--ink); }
+  .g-body :global(table + p em), .g-body :global(p > em:only-child) { font-size: var(--t-xs); color: var(--ink-3); font-family: var(--mono); font-style: normal; }
+  .g-sources { font-size: var(--t-sm); }
+  @media (max-width: 60rem) { .g-grid { grid-template-columns: 1fr; } .g-side { position: static; } }
+</style>

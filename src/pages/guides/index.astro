@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { longDate } from '../../lib/format.ts';
+import { abs } from '../../lib/seo.ts';
+
+const guides = (await getCollection('guides')).filter((g) => g.data.status !== 'draft').sort((a, b) => a.data.title.localeCompare(b.data.title));
+const ld = [{
+  '@type': 'CollectionPage', '@id': abs('/guides/') + '#page', url: abs('/guides/'), name: 'RateRunner guides',
+  hasPart: guides.map((g) => ({ '@type': 'Article', headline: g.data.title, url: abs(`/guides/${g.id}/`) })),
+}];
+---
+<Base
+  title="Money Transfer Guides: Markups, Fees, Limits and Timing"
+  description="Plain-English guides to the parts of an international money transfer nobody itemises: exchange-rate markups, wire fees, payout methods, limits, taxes and timing."
+  path="/guides/"
+  og="guides"
+  ld={ld}
+  crumbs={[{ name: 'Home', path: '/' }, { name: 'Guides', path: '/guides/' }]}
+>
+  <div class="wrap">
+    <header class="gi-head">
+      <h1>Which parts of a money transfer cost more than they seem?</h1>
+      <p class="answer">Mostly the exchange rate, then the payout route and the funding method. These {guides.length} guides take each part of the bill in turn, with sources and the date of every figure.</p>
+    </header>
+    <ol class="gi-list">
+      {guides.map((g) => (
+        <li>
+          <h2><a href={`/guides/${g.id}/`}>{g.data.title}</a></h2>
+          <p>{g.data.answer}</p>
+          <p class="mono gi-meta">Updated {longDate(g.data.updated)} · data as of {longDate(g.data.data_asof)} · {g.data.sources.length} sources</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Base>
+<style>
+  .gi-head { padding: var(--s-5) 0; max-width: 62rem; }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .gi-list { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--ink); max-width: 52rem; counter-reset: g; }
+  .gi-list li { border-bottom: 1px solid var(--rule); padding: var(--s-4) 0 var(--s-3); counter-increment: g; position: relative; padding-left: 3rem; }
+  .gi-list li::before { content: counter(g, decimal-leading-zero); position: absolute; left: 0; top: var(--s-4); font: 600 var(--t-sm) var(--mono); color: var(--ink-3); }
+  .gi-list h2 { font-size: var(--t-lg); margin: 0 0 var(--s-2); }
+  .gi-list p { margin: 0 0 var(--s-2); color: var(--ink-2); font-size: var(--t-sm); }
+  .gi-meta { font-size: var(--t-xs) !important; color: var(--ink-3) !important; }
+</style>

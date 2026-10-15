@@ -1,0 +1,197 @@
+---
+import Base from '../layouts/Base.astro';
+import '../styles/receipt.css';
+import Faq from '../components/Faq.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { allCorridors, corridorView, referenceMid, slugOf, placeShort } from '../lib/data.ts';
+import { buildLines, impliedMarkup, markupCost } from '../lib/cost.ts';
+import { money, pct, rate, longDate, stamp } from '../lib/format.ts';
+import { faqLd, abs } from '../lib/seo.ts';
+import site from '../site.config.ts';
+
+const views = allCorridors();
+// Mid-market reference per corridor: Wise's own quote when it is flagged as mid-market (collected minutes before
+// retrieval), otherwise the ECB reference rate. Both are labelled with their time.
+const mids = views.map((v) => {
+  const b = v.headline!;
+  const midQ = b.band.providers.find((q) => q.isMid);
+  const ecb = referenceMid(v.from, v.to);
+  return {
+    slug: v.slug, from: v.from, to: v.to,
+    mid: midQ ? midQ.rate : ecb?.rate ?? null,
+    basis: midQ ? `mid-market rate in Wise comparison data, ${stamp(midQ.collectedAt)}` : ecb ? `ECB reference rate, ${longDate(ecb.date)}` : 'unavailable',
+  };
+});
+const ex = corridorView('USD', 'MXN');
+const exBand = ex.headline!;
+const exLines = buildLines(exBand.amount, exBand.band.providers);
+const exBank = exLines.filter((l) => l.quote.type === 'bank').sort((a, b) => b.totalCost - a.totalCost)[0] ?? exLines[exLines.length - 1]!;
+const exMid = exBank.midAtCollection;
+
+// Markup distribution across the whole snapshot at 1,000 (ranked quotes only)
+const lines = views.flatMap((v) => buildLines(1000, v.bands.find((b) => b.amount === 1000)?.band.providers ?? []));
+const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); const m = s.length >> 1; return s.length ? (s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2) : NaN; };
+const banks = lines.filter((l) => l.quote.type === 'bank');
+const svcs = lines.filter((l) => l.quote.type !== 'bank');
+const stats = [
+  { label: 'Banks', n: banks.length, med: median(banks.map((l) => l.quote.markup)), max: Math.max(...banks.map((l) => l.quote.markup)) },
+  { label: 'Transfer services', n: svcs.length, med: median(svcs.map((l) => l.quote.markup)), max: Math.max(...svcs.map((l) => l.quote.markup)) },
+];
+const snapDate = longDate(exBand.band.fetchedAt);
+
+const faq = [
+  { q: 'What is an exchange-rate markup?', a: 'It is the difference between the mid-market rate and the rate a provider gives you, expressed as a percentage. A markup of 2% on 1,000 converted costs about 20 in the sending currency, even when the provider advertises no fee.' },
+  { q: 'How do I calculate the markup on a rate I was offered?', a: 'Divide the offered rate by the mid-market rate for the same moment, subtract the result from 1 and multiply by 100. For example, 17.96 offered against a mid-market rate of 18.52 is (1 − 17.96 ÷ 18.52) × 100 = 3.02%.' },
+  { q: 'Which mid-market rate should I compare against?', a: 'Use a rate taken as close as possible to the time of your quote. Rates move during the day, so a reference from hours earlier can make a markup look larger or smaller than it is. The checker on this page shows which reference it uses and when it was taken.' },
+];
+const ld = [
+  {
+    '@type': 'WebApplication', '@id': abs('/hidden-fx-markup/') + '#tool', name: 'Hidden FX markup checker', url: abs('/hidden-fx-markup/'),
+    applicationCategory: 'FinanceApplication', operatingSystem: 'Any', isAccessibleForFree: true,
+    description: 'Calculates the exchange-rate markup and its cost for any offered rate against a dated mid-market reference.',
+    publisher: { '@id': `${site.url}/#organization` },
+  },
+  faqLd(faq),
+];
+---
+<Base
+  title="Hidden FX Markup Checker: What Your Exchange Rate Costs"
+  description="Paste the exchange rate a bank or app offered you and see the hidden markup against a dated mid-market rate, plus what it costs on your amount, step by step."
+  path="/hidden-fx-markup/"
+  og="hidden-fx-markup"
+  ld={ld}
+  crumbs={[{ name: 'Home', path: '/' }, { name: 'Hidden markup', path: '/hidden-fx-markup/' }]}
+>
+  <div class="wrap">
+    <header class="hm-head">
+      <h1>How do you find the hidden markup in an exchange rate?</h1>
+      <p class="answer">Divide the rate you were offered by the mid-market rate, subtract that from 1 and multiply by 100. That percentage is the markup; multiplied by the amount converted, it is the cost that never appears as a fee.</p>
+    </header>
+
+    <div class="hm-grid">
+      <form class="checker" id="mk-form" novalidate data-mids={JSON.stringify(mids)}>
+        <h2 class="label">Markup check · Form RR-2</h2>
+        <label for="mk-corr"><span class="box">1</span> Corridor</label>
+        <select id="mk-corr">
+          {mids.map((m) => <option value={m.slug} selected={m.slug === 'usd-to-mxn'}>{m.from} → {m.to} · {placeShort(m.to)}</option>)}
+        </select>
+        <label for="mk-mid"><span class="box">2</span> Mid-market rate (1 <span class="mk-from">USD</span> = ? <span class="mk-to">MXN</span>)</label>
+        <input id="mk-mid" type="number" inputmode="decimal" step="any" min="0" value={mids.find((m) => m.slug === 'usd-to-mxn')?.mid ?? ''} aria-describedby="mk-mid-basis" />
+        <p class="hint" id="mk-mid-basis">{mids.find((m) => m.slug === 'usd-to-mxn')?.basis}. Replace it with a fresher rate if you have one.</p>
+        <label for="mk-rate"><span class="box">3</span> Rate you were offered</label>
+        <input id="mk-rate" type="number" inputmode="decimal" step="any" min="0" value={exBank.quote.rate.toFixed(4)} aria-describedby="mk-err" />
+        <label for="mk-amt"><span class="box">4</span> Amount you send (<span class="mk-from">USD</span>)</label>
+        <input id="mk-amt" type="number" inputmode="decimal" step="any" min="0" value="1000" />
+        <label for="mk-fee"><span class="box">5</span> Upfront fee (<span class="mk-from">USD</span>)</label>
+        <input id="mk-fee" type="number" inputmode="decimal" step="any" min="0" value={exBank.quote.fee} />
+        <p class="err" id="mk-err" role="alert" hidden></p>
+        <button class="btn" type="submit">Calculate markup</button>
+      </form>
+
+      <div class="receipt mk-out" aria-live="polite">
+        <p class="label">Markup receipt</p>
+        <dl class="r-lines" id="mk-lines">
+          <div><dt>Offered rate ÷ mid-market</dt><dd class="num" id="mk-ratio">{(exBank.quote.rate / exMid).toFixed(5)}</dd></div>
+          <div class="r-hidden"><dt>Markup</dt><dd class="num" id="mk-pct">{pct(impliedMarkup(exBank.quote.rate, exMid))}</dd></div>
+          <div class="r-hidden"><dt>Markup cost</dt><dd class="num" id="mk-cost">{money(markupCost(1000, exBank.quote.fee, impliedMarkup(exBank.quote.rate, exMid)), 'USD')}</dd></div>
+          <div><dt>Upfront fee</dt><dd class="num" id="mk-feeo">{money(exBank.quote.fee, 'USD')}</dd></div>
+          <div class="r-total"><dt>True total cost</dt><dd class="num" id="mk-total">{money(exBank.quote.fee + markupCost(1000, exBank.quote.fee, impliedMarkup(exBank.quote.rate, exMid)), 'USD')}</dd></div>
+          <div class="r-gets"><dt>Recipient gets</dt><dd class="num" id="mk-gets">{money((1000 - exBank.quote.fee) * exBank.quote.rate, 'MXN')}</dd></div>
+        </dl>
+        <p class="r-foot" id="mk-foot">Prefilled with {exBank.quote.name}'s USD → MXN quote from the {snapDate} snapshot, compared with the mid-market rate recorded when it was collected ({rate(exMid)}).</p>
+      </div>
+    </div>
+
+    <article class="prose explainer">
+      <h2>A worked example from the {snapDate} snapshot</h2>
+      <p>On {snapDate}, {exBank.quote.name} quoted <span class="num">{rate(exBank.quote.rate)}</span> pesos per US dollar for a 1,000 USD transfer, with an upfront fee of <span class="num">{money(exBank.quote.fee, 'USD')}</span>. The mid-market rate when the quote was collected was <span class="num">{rate(exMid)}</span>.</p>
+      <ol>
+        <li>Ratio: <span class="num">{rate(exBank.quote.rate)} ÷ {rate(exMid)} = {(exBank.quote.rate / exMid).toFixed(5)}</span></li>
+        <li>Markup: <span class="num">(1 − {(exBank.quote.rate / exMid).toFixed(5)}) × 100 = {pct(exBank.quote.markup)}</span></li>
+        <li>Amount converted: <span class="num">1,000 − {exBank.quote.fee.toFixed(2)} = {(1000 - exBank.quote.fee).toFixed(2)} USD</span></li>
+        <li>Markup cost: <span class="num">{(1000 - exBank.quote.fee).toFixed(2)} × {pct(exBank.quote.markup)} = {money(exBank.markupCost, 'USD')}</span></li>
+        <li>True total cost: <span class="num">{money(exBank.quote.fee, 'USD')} + {money(exBank.markupCost, 'USD')} = {money(exBank.totalCost, 'USD')}</span> ({pct(exBank.totalPct)} of the amount sent)</li>
+      </ol>
+      <p>The best quote in the same snapshot delivered <span class="num">{money(exLines[0]!.quote.received, 'MXN')}</span>, which is <span class="num">{money(exBank.shortfallVsBest, 'MXN')}</span> more than {exBank.quote.name}. Most of that gap came from the rate, not the fee. See the full <a href="/send/usd-to-mxn/">USD → MXN ledger</a>.</p>
+
+      <h2>How large are markups in practice?</h2>
+      <p>Across the {lines.length} ranked quotes for sending 1,000 in the {snapDate} snapshot ({views.length} corridors), markups split clearly by provider type:</p>
+      <div class="ledger-scroll" tabindex="0" role="region" aria-label="Markup by provider type">
+        <table class="ledger">
+          <thead><tr><th scope="col">Provider type</th><th scope="col">Quotes</th><th scope="col">Median markup</th><th scope="col">Highest markup</th></tr></thead>
+          <tbody>
+            {stats.map((s) => <tr><td>{s.label}</td><td>{s.n}</td><td>{pct(s.med)}</td><td class="cost">{pct(s.max)}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <p>The bank figures cover only the banks that appear in Wise’s comparison data for these corridors, mostly large US, UK, eurozone, Canadian and Australian banks. They are indicative quotes, not a census of every bank.</p>
+
+      <h2>Why markups are easy to miss</h2>
+      <p>A fee is a separate line on a receipt; a markup is folded into the rate, so the only place it shows is in how much the recipient gets. Since 2020, EU rules have required payment providers to express currency-conversion charges on card payments as a percentage markup over the latest European Central Bank reference rate, precisely so people can compare them (<a href="https://eur-lex.europa.eu/eli/reg/2019/518/oj">Regulation (EU) 2019/518</a>). In the United States, the remittance transfer rule requires providers to disclose the exchange rate and the amount the recipient will receive before you pay (<a href="https://www.consumerfinance.gov/rules-policy/regulations/1005/31/">Regulation E, 12 CFR 1005.31</a>), which is what lets you calculate the markup yourself.</p>
+      <p>More on this: <a href="/guides/exchange-rate-markup-explained/">how exchange-rate markups work</a> and <a href="/guides/mid-market-rate/">what the mid-market rate is and where to find it</a>.</p>
+    </article>
+
+    <AdSlot id="incontent1" />
+    <Faq items={faq} />
+  </div>
+</Base>
+
+<script>
+  import { impliedMarkup, markupCost } from '../lib/cost.ts';
+  import { money, pct } from '../lib/format.ts';
+  const f = document.getElementById('mk-form') as HTMLFormElement | null;
+  if (f) {
+    const mids: { slug: string; from: string; to: string; mid: number | null; basis: string }[] = JSON.parse(f.dataset.mids || '[]');
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const corr = $<HTMLSelectElement>('mk-corr'), mid = $<HTMLInputElement>('mk-mid'), rt = $<HTMLInputElement>('mk-rate'), amt = $<HTMLInputElement>('mk-amt'), fee = $<HTMLInputElement>('mk-fee'), err = $('mk-err');
+    const cur = () => mids.find((m) => m.slug === corr.value)!;
+    corr.addEventListener('change', () => {
+      const m = cur();
+      mid.value = m.mid ? String(m.mid) : '';
+      $('mk-mid-basis').textContent = `${m.basis}. Replace it with a fresher rate if you have one.`;
+      document.querySelectorAll('.mk-from').forEach((e) => (e.textContent = m.from));
+      document.querySelectorAll('.mk-to').forEach((e) => (e.textContent = m.to));
+      rt.value = ''; rt.focus();
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const m = cur();
+      const M = Number(mid.value), R = Number(rt.value), A = Number(amt.value), F = Number(fee.value || 0);
+      let msg = '';
+      if (!(M > 0)) msg = 'Enter a mid-market rate greater than zero.';
+      else if (!(R > 0)) msg = 'Enter the rate you were offered (units of the receiving currency per 1 unit sent).';
+      else if (!(A > 0)) msg = 'Enter the amount you send.';
+      else if (F < 0 || F >= A) msg = 'The fee must be zero or more, and less than the amount.';
+      else if (R / M > 1.5 || R / M < 0.5) msg = 'That rate is more than 50% away from the mid-market rate. Check that both are quoted the same way round.';
+      err.hidden = !msg; err.textContent = msg;
+      if (msg) return;
+      const mk = impliedMarkup(R, M); const mc = markupCost(A, F, mk);
+      $('mk-ratio').textContent = (R / M).toFixed(5);
+      $('mk-pct').textContent = pct(mk);
+      $('mk-cost').textContent = money(mc, m.from);
+      $('mk-feeo').textContent = money(F, m.from);
+      $('mk-total').textContent = money(F + mc, m.from);
+      $('mk-gets').textContent = money((A - F) * R, m.to);
+      $('mk-foot').textContent = `Your figures, compared with: ${mid.value === String(m.mid) ? m.basis : 'the mid-market rate you entered'}.`;
+      (window as any).rrTrack?.('tool_used', { tool: 'markup_checker', corridor: `${m.from}-${m.to}` });
+    });
+  }
+</script>
+
+<style>
+  .hm-head { padding: var(--s-5) 0; max-width: 62rem; }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .hm-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-6); align-items: start; }
+  .checker { border: 2px solid var(--ink); background: var(--slip); padding: var(--s-5); display: grid; gap: var(--s-2); }
+  .checker h2 { margin: 0 0 var(--s-2); padding-bottom: var(--s-2); border-bottom: 1px solid var(--ink); }
+  .checker label { display: flex; align-items: center; gap: var(--s-2); font: 500 var(--t-sm) var(--mono); margin-top: var(--s-3); }
+  .box { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border: 1.5px solid var(--ink); font: 600 var(--t-xs) var(--mono); }
+  .checker select, .checker input { width: 100%; min-height: 48px; font: 500 var(--t-md) var(--mono); background: #fff; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 0 var(--s-2); color: var(--ink); }
+  .hint { font: var(--t-xs)/1.5 var(--mono); color: var(--ink-3); margin: 0; }
+  .err { color: var(--stamp); font-weight: 600; font-size: var(--t-sm); margin: var(--s-2) 0 0; }
+  .checker .btn { margin-top: var(--s-4); }
+  .mk-out { min-height: 22rem; }
+  .explainer { margin-top: var(--s-6); }
+  .explainer ol .num { white-space: normal; }
+  @media (max-width: 56rem) { .hm-grid { grid-template-columns: 1fr; } }
+</style>

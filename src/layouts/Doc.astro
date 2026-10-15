@@ -1,0 +1,22 @@
+---
+import Base from './Base.astro';
+interface Props { title: string; seoTitle: string; description: string; path: string; lede: string; updated: string; ld?: object[]; og?: string }
+const { title, seoTitle, description, path, lede, updated, ld = [], og = 'default' } = Astro.props;
+const name = title;
+---
+<Base title={seoTitle} description={description} path={path} og={og} ld={ld} crumbs={[{ name: 'Home', path: '/' }, { name, path }]}>
+  <article class="wrap doc">
+    <header>
+      <h1>{title}</h1>
+      <p class="answer">{lede}</p>
+      <p class="label">Last updated <time datetime={updated}>{updated}</time></p>
+    </header>
+    <div class="prose doc-body"><slot /></div>
+  </article>
+</Base>
+<style>
+  .doc header { padding: var(--s-5) 0 var(--s-4); max-width: 62rem; border-bottom: 1px solid var(--rule); margin-bottom: var(--s-5); }
+  .answer { font-size: var(--t-lg); line-height: 1.5; max-width: 62ch; border-left: 3px solid var(--stamp); padding-left: var(--s-4); }
+  .doc-body :global(h2) { font-size: var(--t-lg); margin-top: var(--s-6); }
+  .doc-body :global(table) { margin: var(--s-4) 0; }
+</style>
