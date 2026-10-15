@@ -9,3 +9,4 @@ qa/*.png
 .DS_Store
 *.log
 .wrangler/
+qa/*.log
