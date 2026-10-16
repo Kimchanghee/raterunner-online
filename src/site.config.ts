@@ -15,6 +15,8 @@ export const site = {
   bingVerification: (env.PUBLIC_BING_VERIFICATION as string | undefined) ?? '',
   naverVerification: (env.PUBLIC_NAVER_VERIFICATION as string | undefined) ?? '',
   adsenseClient: 'ca-pub-4490818204529253',
+  /** Ad loading is OFF unless the build sets PUBLIC_ADS_ENABLED=true (AdSense account / certified CMP not yet verified). */
+  adsEnabled: env.PUBLIC_ADS_ENABLED === 'true',
   adSlots: {
     incontent1: (env.PUBLIC_ADSENSE_SLOT_INCONTENT1 as string | undefined) ?? '',
     incontent2: (env.PUBLIC_ADSENSE_SLOT_INCONTENT2 as string | undefined) ?? '',

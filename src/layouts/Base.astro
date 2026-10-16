@@ -77,7 +77,7 @@ const here = Astro.url.pathname;
       gtag('js', new Date()); gtag('config', ga);
     }
   </script>
-  <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.adsenseClient}`} crossorigin="anonymous"></script>
+  {site.adsEnabled && <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.adsenseClient}`} crossorigin="anonymous"></script>}
   <slot name="head" />
 </head>
 <body>

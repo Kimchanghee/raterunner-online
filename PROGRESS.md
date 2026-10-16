@@ -22,4 +22,4 @@ ode node_modules/astro/astro.js preview --port 4321 --host 127.0.0.1 (host resta
 
 - Build: use `node node_modules/astro/astro.js build` (7-10 s). `pnpm build` hangs on this host (pnpm wrapper, not astro). Set ASTRO_TELEMETRY_DISABLED=1.
 
-
+- [x] Ads safety fix 2026-10-16: AdSense loader gated by site.adsEnabled (PUBLIC_ADS_ENABLED === 'true', default false); verification meta and ads.txt retained; privacy copy corrected (ads disabled pending account/CMP setup, no consent banner or certified CMP claimed); gate asserts no loader when disabled and loader present when enabled. Regional GA4 consent defaults unchanged. Not deployed.

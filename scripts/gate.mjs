@@ -42,6 +42,18 @@ if (/Disallow:\s*\/\s*$/m.test(robots)) fail('robots.txt', 'blocks the whole sit
 const ads = existsSync(join(dist, 'ads.txt')) ? readFileSync(join(dist, 'ads.txt'), 'utf8') : '';
 if (!ads.includes('google.com, pub-4490818204529253, DIRECT, f08c47fec0942fa0')) fail('ads.txt', 'wrong content');
 
+// Ads gate: AdSense loader must be absent unless PUBLIC_ADS_ENABLED=true; verification meta and ads.txt stay regardless.
+{
+  const adsOn = process.env.PUBLIC_ADS_ENABLED === 'true';
+  for (const f of walk(dist).filter((f) => f.endsWith('.html'))) {
+    const h = readFileSync(f, 'utf8');
+    const loader = /pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js/.test(h) || /class="adsbygoogle"/.test(h);
+    const rel = f.slice(dist.length);
+    if (!adsOn && loader) fail(rel, 'AdSense loader/ad unit present while PUBLIC_ADS_ENABLED is not true');
+    if (adsOn && !/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-4490818204529253/.test(h)) fail(rel, 'ads enabled but AdSense loader missing');
+  }
+}
+
 const sitemapUrls = new Set();
 for (const n of readdirSync(dist).filter((n) => /^sitemap-.*\.xml$/.test(n) && n !== 'sitemap-index.xml')) {
   const xml = readFileSync(join(dist, n), 'utf8');

@@ -6,7 +6,7 @@ interface Props { id: 'incontent1' | 'incontent2' }
 const { id } = Astro.props;
 const slot = site.adSlots[id] ?? '';
 ---
-{slot && (
+{site.adsEnabled && slot && (
   <aside class="ad-slot" aria-label="Advertisement">
     <ins class="adsbygoogle" style="display:block;width:100%;min-height:250px" data-ad-client={site.adsenseClient} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
