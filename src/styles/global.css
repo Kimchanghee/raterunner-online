@@ -119,6 +119,6 @@ table.ledger tr.aside td { color: var(--ink-3); background: var(--paper); }
   table.ledger.ranked td[data-l]::before { content: attr(data-l) ' '; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
   table.ledger.ranked td.pct, table.ledger.ranked td.na { display: none; }
   table.ledger.ranked tr.aside-h { display: block; }
-  table.ledger.ranked tr.aside-h th { display: block; padding: 0.5rem 0; border: 0; background: none; }
+  table.ledger.ranked tr.aside-h th { display: block; padding: 0.5rem 0; border: 0; background: none; white-space: normal; overflow-wrap: anywhere; }
   .ledger-scroll:has(table.ranked) { overflow-x: visible; }
 }
