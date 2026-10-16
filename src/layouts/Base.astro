@@ -159,8 +159,8 @@ const here = Astro.url.pathname;
   .foot-data { font-size: var(--t-xs); line-height: 1.55; }
   @media (max-width: 52rem) {
     .foot-grid { grid-template-columns: 1fr; }
-    .site-nav { width: 100%; overflow-x: auto; }
-    .site-nav ul { flex-wrap: nowrap; }
+    .site-nav { width: 100%; margin-left: calc(-1 * var(--s-2)); }
+    .site-nav ul { flex-wrap: wrap; row-gap: 0; }
     .site-nav a { padding: 0 var(--s-2); white-space: nowrap; }
     .head-row { padding-top: var(--s-2); }
   }
