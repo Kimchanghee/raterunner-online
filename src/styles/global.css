@@ -102,3 +102,23 @@ table.ledger td.name { white-space: normal; min-width: 9rem; }
 @media print { .ad-slot, .site-nav, .site-foot nav { display: none; } body { background: #fff; } }
 table.ledger tr.aside-h th { text-align: left; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); font-weight: 500; background: var(--paper); border-top: 1px solid var(--rule-strong); }
 table.ledger tr.aside td { color: var(--ink-3); background: var(--paper); }
+
+/* Ranked ledger on small screens: each quote becomes a two-line receipt entry so the
+   figure that decides the ranking (recipient gets) is never hidden off-scroll. */
+@media (max-width: 40rem) {
+  table.ledger.ranked thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  table.ledger.ranked, table.ledger.ranked tbody { display: block; }
+  table.ledger.ranked tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.9rem; padding: 0.7rem var(--s-3); border-bottom: 1px solid var(--rule); }
+  table.ledger.ranked tbody tr:last-child { border-bottom: 0; }
+  table.ledger.ranked td { display: block; padding: 0; border: 0; white-space: nowrap; text-align: left; background: none; }
+  table.ledger.ranked tr.best { background: var(--ok-tint); }
+  table.ledger.ranked td.name { order: 1; flex: 1 1 55%; min-width: 0; white-space: normal; }
+  table.ledger.ranked td.recv { order: 2; text-align: right; margin-left: auto; }
+  table.ledger.ranked td.fee, table.ledger.ranked td.mk, table.ledger.ranked td.cost, table.ledger.ranked td.vs { order: 3; font-size: var(--t-xs); color: var(--ink-2); }
+  table.ledger.ranked td.cost { color: var(--stamp); }
+  table.ledger.ranked td[data-l]::before { content: attr(data-l) ' '; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  table.ledger.ranked td.pct, table.ledger.ranked td.na { display: none; }
+  table.ledger.ranked tr.aside-h { display: block; }
+  table.ledger.ranked tr.aside-h th { display: block; padding: 0.5rem 0; border: 0; background: none; }
+  .ledger-scroll:has(table.ranked) { overflow-x: visible; }
+}

@@ -75,7 +75,7 @@ export function ledgerRowsHtml(send: number, from: string, to: string, quotes: Q
   const lines: CostLine[] = buildLines(send, sc.ranked);
   const aside = sc.setAside.length
     ? `<tr class="aside-h"><th scope="rowgroup" colspan="7">Set aside, not ranked (`+sc.setAside.length+`): see methodology</th></tr>` +
-      sc.setAside.map((s) => `<tr class="aside"><td class="name">`+esc(s.quote.name)+`<span class="tag">`+esc(s.reason)+`</span></td><td>`+esc(money(s.quote.fee, from))+`</td><td>`+esc(pct(s.quote.markup))+`</td><td>—</td><td>—</td><td>`+esc(money(s.quote.received, to))+`</td><td>—</td></tr>`).join('')
+      sc.setAside.map((s) => `<tr class="aside"><td class="name">`+esc(s.quote.name)+`<span class="tag">`+esc(s.reason)+`</span></td><td class="fee" data-l="fee">`+esc(money(s.quote.fee, from))+`</td><td class="mk" data-l="markup">`+esc(pct(s.quote.markup))+`</td><td class="na">—</td><td class="na">—</td><td class="recv">`+esc(money(s.quote.received, to))+`</td><td class="na">—</td></tr>`).join('')
     : '';
   return lines
     .map((l) => {
@@ -84,12 +84,12 @@ export function ledgerRowsHtml(send: number, from: string, to: string, quotes: Q
       const name = href ? `<a href="${esc(href)}" data-provider="${esc(q.alias)}">${esc(q.name)}</a>` : esc(q.name);
       return `<tr${l.rank === 1 ? ' class="best"' : ''}>
   <td class="name"><span class="rank">${l.rank}.</span> ${name}<span class="tag">${q.type === 'bank' ? 'bank' : 'service'}</span>${ageNote(q, fetchedAt)}</td>
-  <td>${esc(money(q.fee, from))}</td>
-  <td>${esc(pct(q.markup))}</td>
-  <td class="cost">${esc(money(l.totalCost, from))}</td>
-  <td>${esc(pct(l.totalPct))}</td>
-  <td><strong>${esc(money(q.received, to))}</strong></td>
-  <td>${l.rank === 1 ? '—' : esc(money(-l.shortfallVsBest, to))}</td>
+  <td class="fee" data-l="fee">${esc(money(q.fee, from))}</td>
+  <td class="mk" data-l="markup">${esc(pct(q.markup))}</td>
+  <td class="cost" data-l="true cost">${esc(money(l.totalCost, from))}</td>
+  <td class="pct">${esc(pct(l.totalPct))}</td>
+  <td class="recv"><strong>${esc(money(q.received, to))}</strong></td>
+  <td class="vs" data-l="vs best">${l.rank === 1 ? 'best' : esc(money(-l.shortfallVsBest, to))}</td>
 </tr>`;
     })
     .join('') + aside;

@@ -59,7 +59,7 @@ const best = band.summary.best.quote;
   <h2 id="ledger-h"><span id="rr-ledger-title">Every quote for {band.amount.toLocaleString('en-US')} {view.from} → {view.to}</span></h2>
   <p class="ledger-lede">Sorted by what the recipient gets. “True cost” adds the upfront fee to the money lost in the exchange rate versus the mid-market rate at the time each quote was collected.</p>
   <div class="ledger-scroll" tabindex="0" role="region" aria-labelledby="ledger-h">
-    <table class="ledger" id="rr-ledger">
+    <table class="ledger ranked" id="rr-ledger">
       <caption class="visually-hidden">Provider quotes ranked by amount received</caption>
       <Fragment set:html={LEDGER_HEAD} />
       <tbody id="rr-rows" set:html={initialRows} />
