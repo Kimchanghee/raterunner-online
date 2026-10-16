@@ -11,7 +11,10 @@ Branch: `v2-cloudflare-static`. Contract: `../CONTRACT.md`. Brief: `../BRIEFS.md
 - [x] M5 Guides: 12 guides + /guides/ + RSS (/rss.xml)
 - [x] M6 SEO files: sitemap (per-page lastmod), robots, llms.txt, ads.txt, IndexNow key file, 58 OG PNGs, JSON-LD
 - [x] M7 gate.mjs PASS 62 pages / 62 sitemap URLs; tests 10 pass; astro check 0 errors (test typings fixed); scripts/refresh-build.ps1
-- [ ] M8 QA: build, check, gate, curl crawl, Playwright screenshots, scorecard before/after, measure.md
+- [~] M8 QA: build/check/gate/tests DONE; curl crawl DONE (qa/crawl.md, all 200 + 404 path=404); Playwright 1440/390 via qa/shots.cjs DONE (no page overflow, CLS<=0.03, focus outline 3px); mobile ledger stacking + nav wrap fixed. TODO: content/backlog.md, seo/scorecard.md, seo/measure.md, DESIGN_REFERENCES.md
+  - Playwright note: _pw-browsers folder does not exist and playwright 1.64 wants chromium-1248; qa/shots.cjs uses executablePath %LOCALAPPDATA%/ms-playwright/chromium-1243 (no download).
+  - Preview: 
+ode node_modules/astro/astro.js preview --port 4321 --host 127.0.0.1 (host restarts kill it).
 - [ ] M9 Final report
 
 ## Notes
