@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import type { Quote } from '../src/lib/cost.ts';
 import { markupCost, totalCost, midFromQuote, receivedAt, impliedMarkup, buildLines, summarise, humanDuration, ageHours, round } from '../src/lib/cost.ts';
 
 // Hand-computed case (USD->MXN, $1,000, quote as published in the Wise comparison data on 2026-10-13):
@@ -38,7 +39,7 @@ test('negative markup (rate above mid at collection) yields negative markup cost
   assert.equal(round(totalCost(1000, 0, -0.8368989), 4), -8.369);
 });
 
-const quotes = [
+const quotes: Quote[] = [
   { alias: 'a', name: 'Bank A', type: 'bank', fee: 5, markup: 3, rate: 17.95, received: 17860.25, isMid: false, collectedAt: '2026-10-15T00:00:00Z', delivery: null },
   { alias: 'b', name: 'Specialist B', type: 'provider', fee: 0, markup: 1, rate: 18.315, received: 18315, isMid: false, collectedAt: '2026-10-15T00:00:00Z', delivery: null },
   { alias: 'c', name: 'Specialist C', type: 'provider', fee: 8, markup: 0, rate: 18.5, received: 18352, isMid: true, collectedAt: '2026-10-14T12:00:00Z', delivery: { min: 'PT30M', max: 'PT30M' } },
@@ -53,20 +54,20 @@ test('lines ranked by what the recipient gets, with shortfall', () => {
   assert.equal(round(lines[2].totalCost, 2), 34.85);
   assert.equal(round(lines[2].totalPct, 3), 3.485);
   // hidden share: 29.85 / 34.85
-  assert.equal(round(lines[2].hiddenShare, 4), round(29.85 / 34.85, 4));
+  assert.equal(round(lines[2].hiddenShare as number, 4), round(29.85 / 34.85, 4));
   assert.equal(lines[0].hiddenShare, 0);
 });
 
 test('summary statistics', () => {
-  const s = summarise(1000, quotes);
+  const s = summarise(1000, quotes)!;
   assert.equal(s.count, 3);
   assert.equal(s.best.quote.alias, 'c');
   assert.equal(s.worst.quote.alias, 'a');
   assert.equal(round(s.spreadTarget, 2), 491.75);
   assert.equal(s.zeroFeeWithMarkup, 1);
-  assert.equal(round(s.bankAvgPct, 3), 3.485);
+  assert.equal(round(s.bankAvgPct as number, 3), 3.485);
   // providers: B 1.0 %, C 0.8 % -> 0.9 %
-  assert.equal(round(s.providerAvgPct, 3), 0.9);
+  assert.equal(round(s.providerAvgPct as number, 3), 0.9);
   assert.equal(summarise(1000, []), null);
 });
 
@@ -82,8 +83,8 @@ test('durations and ages', () => {
 
 test('screen sets aside old and implausible quotes', async () => {
   const { screen } = await import('../src/lib/cost.ts');
-  const base = { alias: 'x', name: 'X', type: 'provider', fee: 0, rate: 1, received: 100, isMid: false, delivery: null };
-  const qs = [
+  const base = { alias: 'x', name: 'X', type: 'provider' as const, fee: 0, rate: 1, received: 100, isMid: false, delivery: null };
+  const qs: Quote[] = [
     { ...base, alias: 'fresh', markup: 1, collectedAt: '2026-10-15T10:00:00Z' },
     { ...base, alias: 'old', markup: 1, collectedAt: '2026-10-12T10:00:00Z' },
     { ...base, alias: 'promo', markup: -0.4, collectedAt: '2026-10-15T10:00:00Z' },

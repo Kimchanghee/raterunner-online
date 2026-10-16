@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 const quotes = JSON.parse(readFileSync(new URL('./src/data/quotes.json', import.meta.url), 'utf8'));
 const dataDate = quotes.asOf ? new Date(quotes.asOf) : undefined;
 // lastmod for guides = frontmatter updated; for static trust pages = their visible "Last updated" date.
+/** @type {Record<string, string>} */
 const lastmod = {};
 const gdir = new URL('./src/content/guides/', import.meta.url);
 let newestGuide = '';
