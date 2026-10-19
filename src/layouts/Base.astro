@@ -60,6 +60,7 @@ const here = Astro.url.pathname;
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
   <meta name="google-adsense-account" content={site.adsenseClient} />
+    <Fragment set:html={'<meta name="impact-site-verification" value="26855777-7b7c-4456-909f-44fb01938cf7">'} />
   {site.gscVerification && <meta name="google-site-verification" content={site.gscVerification} />}
   {site.bingVerification && <meta name="msvalidate.01" content={site.bingVerification} />}
   {site.naverVerification && <meta name="naver-site-verification" content={site.naverVerification} />}
