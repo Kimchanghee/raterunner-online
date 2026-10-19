@@ -1,0 +1,14 @@
+---
+// Shown above the calculator on every page that can render a provider link.
+import { anyActive } from '../lib/partners.ts';
+const sponsored = anyActive();
+---
+<p class="partner-disc" role="note">
+  {sponsored
+    ? <><strong>Disclosure:</strong> some provider buttons are sponsored links, and RateRunner may earn a commission if you use them. </>
+    : <><strong>No sponsored links here.</strong> Provider buttons go to official sites and earn RateRunner nothing. </>}
+  Ranking is always by the amount the recipient gets and is never affected by commissions. <a href="/disclaimer/">How we make money</a>
+</p>
+<style>
+  .partner-disc { font-size: var(--t-xs); color: var(--ink-3); font-family: var(--mono); margin: 0 0 var(--s-3); max-width: 70ch; }
+</style>

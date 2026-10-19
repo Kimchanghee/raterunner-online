@@ -3,6 +3,7 @@ import '../styles/receipt.css';
 import { meta, quotes, slugOf, curName, placeShort, type CorridorView } from '../lib/data.ts';
 import { receiptHtml, ledgerRowsHtml, LEDGER_HEAD } from '../lib/render.ts';
 import ProviderCta from './ProviderCta.astro';
+import PartnerDisclosure from './PartnerDisclosure.astro';
 
 interface Props { view: CorridorView; amount?: number; heading?: string; lockCorridor?: boolean }
 const { view, amount = 1000, lockCorridor = false } = Astro.props;
@@ -13,6 +14,7 @@ const groups = [...new Set(meta.list.map((c) => c.from))].map((f) => ({ from: f,
 const bands = meta.amounts;
 const best = band.summary.best.quote;
 ---
+<PartnerDisclosure />
 <section class="calc" aria-labelledby="calc-h">
   <form class="decl" id="rr-form" novalidate data-bands={JSON.stringify(bands)}>
     <h2 id="calc-h" class="label decl-title">Declaration · Form RR-1</h2>

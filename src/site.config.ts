@@ -1,4 +1,6 @@
 // Site-wide configuration. Values that differ per environment come from PUBLIC_* env vars at build time.
+import { activeLinks } from './lib/partners.ts';
+
 const env = (import.meta as any).env ?? {};
 
 export const site = {
@@ -22,15 +24,13 @@ export const site = {
     incontent2: (env.PUBLIC_ADSENSE_SLOT_INCONTENT2 as string | undefined) ?? '',
   } as Record<string, string>,
   indexNowKey: '6be73d7d86230e4c2f51173b799c8184',
-  // Affiliate links render only when non-empty. Until then neutral official links are shown (no rel=sponsored).
-  affiliates: {
-    wise: (env.PUBLIC_AFF_WISE as string | undefined) ?? '',
-    remitly: (env.PUBLIC_AFF_REMITLY as string | undefined) ?? '',
-  } as Record<string, string>,
+  // Sponsored links come only from enabled, verified entries in src/lib/partners.ts. Until then neutral official links are shown (no rel=sponsored).
+  affiliates: activeLinks() as Record<string, string>,
   // Neutral official homepages used when no affiliate URL is configured.
   officialSites: {
     wise: 'https://wise.com/',
     remitly: 'https://www.remitly.com/',
+    xe: 'https://www.xe.com/',
     'western-union': 'https://www.westernunion.com/',
     xoom: 'https://www.xoom.com/',
     instarem: 'https://www.instarem.com/',
