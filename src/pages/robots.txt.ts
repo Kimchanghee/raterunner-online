@@ -2,7 +2,7 @@ import site from '../site.config.ts';
 
 // Allow all crawlers, including AI crawlers (GEO/LLMO). Nothing is blocked.
 export function GET() {
-  const agents = ['Googlebot', 'Bingbot', 'Yeti', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'PerplexityBot', 'Google-Extended', 'Applebot-Extended'];
+  const agents = ['Googlebot', 'Bingbot', 'Yeti', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended'];
   const body = [
     ...agents.flatMap((a) => [`User-agent: ${a}`, 'Allow: /', '']),
     'User-agent: *',

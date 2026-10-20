@@ -14,3 +14,10 @@ Record deployed commit and remote assets, verify robots and X-Robots-Tag, sitema
 
 ## Decisions
 Prioritize indexing blockers first, stale or misleading facts second, then useful query gaps. Investigate any >=30% impression drop only with adequate comparable samples and seasonality context; it is an alert, not automatic proof of algorithmic penalty. Keep an append-only dated measurement record with property, date range and evidence path. NEO is not targeted: this is an English site, not a Korean locale network.
+
+## 2026-10-20 five-lane pass
+- Re-measure date: 2026-11-03 (+14 days from this source release).
+- Numeric baseline: pending console data (GSC/Bing exports are owner-held). Values are unknown, not zero.
+- sameAs and bingVerification intentionally left empty: no owner-confirmed external profiles; Bing ownership is via GSC import.
+- Citation probes (record engine, date, answer, cited URL as O/X): Why can a comparison quote be older than the displayed snapshot? / Why does a transfer sometimes show a negative cost? / What should I compare when the cheapest quote is unavailable? / How do weekends affect reference exchange rates? / What is RateRunner?
+- Leading indicator: AI-crawler visits (GPTBot, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot, Perplexity-User) and /data/snapshot.json fetches in Cloudflare analytics where available.

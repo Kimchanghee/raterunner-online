@@ -18,6 +18,7 @@ export async function GET() {
     `- [Hidden markup checker](${site.url}/hidden-fx-markup/): compute the markup hidden in any quoted rate`,
     `- [Methodology and data sources](${site.url}/methodology/)`,
     `- [About](${site.url}/about/)`,
+    `- [Quote snapshot (JSON)](${site.url}/data/snapshot.json): all corridors and bands with provider, fee, markup, rate, received and collectedAt; data as of ${quotes.asOf}, rebuilt when the quote data refreshes`,
     '',
     '## Guides',
     ...guides.map((g) => `- [${g.data.title}](${site.url}/guides/${g.id}/): ${g.data.answer}`),

@@ -2,15 +2,30 @@
 
 Local candidate inventory, 2026-10-16. These are editorial hypotheses, not observed GSC queries or commissioned posts. No autonomous publication schedule is enabled here.
 
-## Existing intent ownership
-12 original guides live in src/content/guides; each has question, answer, data_asof, sources, faq and updated. Current clusters: mid-market rates and hidden markup; bank wire fees; SWIFT/local payout; transfer time and identity/limits; cash pickup; freelancer payments; India/Mexico/Philippines; US remittance tax. Keep these stable URLs rather than create competing answers.
+## Question queue (updated 2026-10-20)
 
-## Next briefs, in priority order
-1. Why can a comparison quote be older than the displayed snapshot? Update /methodology/ and the markup guide. Direct answer: retrieval time and provider collection time differ; screen old quotes instead of silently treating them as live. Evidence: committed Wise timestamps, 48-hour filter. Links: / and /send/.
-2. Why does a transfer sometimes show a negative cost? Update /guides/exchange-rate-markup-explained/. Explain rates above the collected benchmark, timing and promotions without promising profit. Evidence: dated eligible quote plus arithmetic; link /hidden-fx-markup/ and /methodology/.
-3. Does paying by card change what the recipient receives? Candidate guide only after primary provider fee schedules and card-issuer rules are inspected. Separate provider charges from issuer cash-advance fees. Link bank-wire and cash-pickup guides.
-4. What should I compare when the cheapest quote is unavailable? Candidate guide: availability, payout method and dated quote limitations before price ranking. Require provider eligibility rules; link /send/ and transfer-limits guide.
-5. How do weekends affect reference exchange rates? Update /guides/mid-market-rate/ after reading ECB publication calendar and Frankfurter documentation. Separate reference date from executable retail price; link checker and methodology.
+| Question | Basis | Type | Status | URL |
+|---|---|---|---|---|
+| bank international transfer fees | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/bank-international-wire-fees/ |
+| is cash pickup or bank deposit cheaper for sending money abroad | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/cash-pickup-vs-bank-deposit/ |
+| how do exchange rate markups work | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/exchange-rate-markup-explained/ |
+| how to get paid from abroad as a freelancer | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/freelancer-international-payments/ |
+| how long does an international money transfer take | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/how-long-international-transfers-take/ |
+| what is the mid-market rate | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/mid-market-rate/ |
+| best way to send money to india | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/send-money-to-india/ |
+| cheapest way to send money to mexico | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/send-money-to-mexico/ |
+| cheapest way to send money to the philippines | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/send-money-to-philippines/ |
+| swift vs local transfer fees | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/swift-vs-local-payout/ |
+| why does a money transfer app need my id and set limits | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/transfer-limits-and-id-checks/ |
+| us remittance tax 1 percent cash transfers | Primary sources cited in the guide; dated quote snapshot where used | guide | live | https://raterunner.online/guides/us-remittance-transfer-tax/ |
+| Is there a downloadable copy of the quote snapshot? | Committed Wise comparison snapshot (provider, collectedAt preserved) | data endpoint | live (2026-10-20 release) | https://raterunner.online/data/snapshot.json |
+| Why can a comparison quote be older than the displayed snapshot? | Committed Wise timestamps; 48-hour filter (update /methodology/ and markup guide) | guide update | queued | - |
+| Why does a transfer sometimes show a negative cost? | Dated eligible quote plus arithmetic (update /guides/exchange-rate-markup-explained/) | guide update | queued | - |
+| Does paying by card change what the recipient receives? | Needs primary provider fee schedules and card-issuer rules first | guide | queued (sources needed) | - |
+| What should I compare when the cheapest quote is unavailable? | Provider eligibility rules; links /send/ | guide | queued | - |
+| How do weekends affect reference exchange rates? | ECB publication calendar, Frankfurter docs (update /guides/mid-market-rate/) | guide update | queued | - |
+
+Queue items are editorial hypotheses, not observed GSC queries. Keep existing URLs stable rather than creating competing answers; same-question duplicates get a 301 to the canonical page, 410 only as a last resort.
 
 ## Workflow
 For each brief record question, direct answer, original sources and observation date, subquestions, two useful internal links, intended URL and reviewer. Inspect actual search results and 3–5 relevant originals before drafting, synthesize without copying, and do not fabricate personal experience. Run build, gate, check, tests and mobile review before parent-managed deployment. No page solely to meet a keyword quota. New corridor only with real distinct source data and useful insight.
